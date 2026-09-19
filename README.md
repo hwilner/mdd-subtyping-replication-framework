@@ -15,19 +15,24 @@ This is **Paper 1** of the MDD subtyping series (3 papers). It is the foundation
 | Leave-one-site-out replication stress test | Replication-rate results for our and published subtype schemes. |
 | Release framework harness | Reused by Papers 2–3. |
 
-**Current status:** planning stage; DUA to be requested; no analysis has been run.
+**Current status:** framework implemented and validated on synthetic data; DUA to be requested; no real-data analysis has been run.
 
 ## What is included
 
 | Path | Contents |
 |---|---|
-| `src/` | Harmonization, normative-deviation, and clustering utilities. |
-| `tests/` | Synthetic tests with planted site effects. |
-| `docs/` | Research status, methods scope, and contribution guidance. |
+| `src/loso_replication/combat.py` | Empirical-Bayes ComBat harmonization (optional `neuroCombat` backend with built-in fallback). |
+| `src/loso_replication/loso.py` | Leave-one-site-out framework: site splitting, train/test API, replication metrics (sign consistency, effect-map correlation, held-out significance). |
+| `src/loso_replication/findings.py` | Registry of published MDD connectivity findings as structured effect specs. |
+| `src/loso_replication/simulate.py` | Synthetic multi-site data with planted case-control effects and planted site batch shifts. |
+| `src/loso_replication/io.py` | REST-meta-MDD Phase II loaders; raise clear DUA-required errors until access is approved. |
+| `tests/` | Synthetic tests: ComBat removes planted site effects while preserving biology; LOSO recovers planted replicable effects and flags non-replicable ones. |
+| `docs/` | Research status, methods scope, data-access steps, and contribution guidance. |
 
 ## Use and validation
 
 ```bash
+pip install -e ".[dev]"
 python -m pytest -q
 ```
 
@@ -38,3 +43,5 @@ depression, REST-meta-MDD, subtyping, normative modeling, replication, neuroimag
 ## Documentation
 
 - [Introduction for new readers](docs/INTRODUCTION.md)
+- [REST-meta-MDD Phase II data access](docs/DATA_ACCESS.md)
+- [Contributing](CONTRIBUTING.md)
