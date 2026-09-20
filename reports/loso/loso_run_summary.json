@@ -1,0 +1,13 @@
+{
+  "data_root": "data/demo",
+  "modality": "FC",
+  "synthetic": true,
+  "n_subjects": 240,
+  "n_features": 60,
+  "n_sites": 6,
+  "alpha": 0.05,
+  "harmonization": "combat (built-in empirical Bayes)",
+  "mean_sign_consistency": 0.7600762527233115,
+  "mean_effect_map_correlation": 0.5845394946566804,
+  "mean_heldout_significance": 0.8951427793339558
+}
