@@ -15,7 +15,7 @@ This is **Paper 1** of the MDD subtyping series (3 papers). It is the foundation
 | Leave-one-site-out replication stress test | Replication-rate results for our and published subtype schemes. |
 | Release framework harness | Reused by Papers 2–3. |
 
-**Current status:** framework implemented and validated on synthetic data; DUA to be requested; no real-data analysis has been run.
+**Current status:** framework implemented and validated on synthetic data; post-DUA staging (`scripts/prepare_rest_meta_mdd.py`) and the one-command LOSO benchmark runner (`scripts/run_loso.py`) are in place and run end-to-end in `--synthetic` demo mode (demo outputs in `reports/loso/`). Real-data execution is gated only on DUA approval (issue #2); no real-data analysis has been run.
 
 ## What is included
 
@@ -26,7 +26,12 @@ This is **Paper 1** of the MDD subtyping series (3 papers). It is the foundation
 | `src/loso_replication/findings.py` | Registry of published MDD connectivity findings as structured effect specs. |
 | `src/loso_replication/simulate.py` | Synthetic multi-site data with planted case-control effects and planted site batch shifts. |
 | `src/loso_replication/io.py` | REST-meta-MDD Phase II loaders; raise clear DUA-required errors until access is approved. |
-| `tests/` | Synthetic tests: ComBat removes planted site effects while preserving biology; LOSO recovers planted replicable effects and flags non-replicable ones. |
+| `src/loso_replication/staging.py` | Post-DUA staging: expected file layout, integrity checks, conversion to the framework's `(X, y, sites)` structures, and a synthetic demo mode. |
+| `scripts/prepare_rest_meta_mdd.py` | One-command staging/validation of downloaded DUA data (`--synthetic` for a demo layout). |
+| `scripts/run_loso.py` | One-command LOSO benchmark runner: executes the moment data are staged; writes `reports/loso/`. |
+| `Makefile` | `make benchmark-demo` (synthetic, no DUA) and `make benchmark DATA_ROOT=...` (real, post-DUA). |
+| `reports/loso/` | Synthetic-demo benchmark outputs (fold metrics + run summary); real-data outputs are DUA-restricted. |
+| `tests/` | Synthetic tests: ComBat removes planted site effects while preserving biology; LOSO recovers planted replicable effects and flags non-replicable ones; staging validation and demo roundtrip. |
 | `docs/` | Research status, methods scope, data-access steps, and contribution guidance. |
 
 ## Use and validation
@@ -34,6 +39,18 @@ This is **Paper 1** of the MDD subtyping series (3 papers). It is the foundation
 ```bash
 pip install -e ".[dev]"
 python -m pytest -q
+```
+
+Demo pipeline (no DUA needed):
+
+```bash
+make benchmark-demo
+```
+
+Real-data pipeline (after DUA approval, see [docs/DATA_ACCESS.md](docs/DATA_ACCESS.md)):
+
+```bash
+make benchmark DATA_ROOT=/path/to/rest-meta-mdd
 ```
 
 ## Keywords
