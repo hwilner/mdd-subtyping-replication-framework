@@ -1,6 +1,19 @@
 # Extended Introduction — for Readers with No Neuroscience Background
 
-This page explains the project from absolute zero. If you already know what fMRI and resting-state connectivity are, you probably want [INTRODUCTION.md](INTRODUCTION.md) (the scientific introduction) instead. Everything here is stated in plain language; where the mathematics gets interesting we link to excellent free resources rather than re-teaching them.
+This page explains the project from absolute zero. No statistics or medical background is assumed: every technical idea is first shown on a tiny made-up example you can check by hand, then given intuition, and only then named. If you already know what fMRI and resting-state connectivity are, you probably want [INTRODUCTION.md](INTRODUCTION.md) (the scientific introduction) instead.
+
+**Concept figure.** The whole pipeline in one picture — multi-site data in, harmonization, hide-one-hospital testing, replication scoring, and a benchmark the rest of the series reuses (standalone version: [figures/concept_figure.md](figures/concept_figure.md)):
+
+```mermaid
+flowchart LR
+    subgraph D["Multi-site resting-state fMRI"]
+        S1["Site 1"] & S2["Site 2"] & SN["... Site 25"]
+    end
+    D --> CB["ComBat harmonization<br/>remove site shifts"]
+    CB --> LV["LOSO cross-validation<br/>hide one site per round"]
+    LV --> RM["Replication metrics<br/>sign · map correlation · significance"]
+    RM --> RB["Reusable benchmark for<br/>subtyping & prediction papers"]
+```
 
 ## The clinical problem: what is depression (MDD)?
 
@@ -42,23 +55,94 @@ The lesson isn't that brain-based depression subtypes are impossible — it's th
 
 Even if you record the same song on two different brands of microphone, the recordings differ: one is brighter, one is bassier. Nobody would conclude the singer changed. MRI scanners are the same: a Siemens scanner and a GE scanner, or even the same model at two hospitals with different calibration, produce systematically different numbers for the same brain. These systematic site-to-site differences are called **batch effects** or **site effects**.
 
-Batch effects are deadly for multi-site research because they can masquerade as biology: if site A happens to scan more severely ill patients and also runs "brighter" than site B, a naive analysis can confuse microphone for singer. The standard remedy is **ComBat harmonization** [6], described below.
+Batch effects are deadly for multi-site research because they can masquerade as biology: if site A happens to scan more severely ill patients and also runs "brighter" than site B, a naive analysis can confuse microphone for singer. The standard remedy is **ComBat harmonization** [6] — and we can see exactly how it works on six imaginary patients.
 
-## What this project does
+### ComBat on a tiny example
+
+Imagine we measured one connectivity number (say, how synchronized two brain regions are) for 6 people scanned at 2 hospitals. Three patients and three healthy controls, spread across the hospitals:
+
+| Person | Hospital | Diagnosis | Raw connectivity |
+|---|---|---|---|
+| P1 | A | Patient | 0.10 |
+| P2 | B | Patient | 0.30 |
+| P3 | B | Patient | 0.34 |
+| C1 | A | Control | 0.40 |
+| C2 | B | Control | 0.62 |
+| C3 | A | Control | 0.46 |
+
+Look only at the raw column and you might conclude patients differ wildly from controls *and* that patients P2/P3 (hospital B) look "less ill" than P1 (hospital A). But check the hospital averages: hospital A's numbers average (0.10+0.40+0.46)/3 ≈ **0.32**, hospital B's average (0.30+0.34+0.62)/3 ≈ **0.42**. Hospital B's scanner reads about 0.10 higher on everything — the same way one microphone records everything brighter.
+
+Now subtract each hospital's own average shift and re-center everyone on the overall mean (0.37):
+
+| Person | Raw | Minus hospital shift (±0.05) | Harmonized |
+|---|---|---|---|
+| P1 | 0.10 | +0.05 | 0.15 |
+| P2 | 0.30 | −0.05 | 0.25 |
+| P3 | 0.34 | −0.05 | 0.29 |
+| C1 | 0.40 | +0.05 | 0.45 |
+| C2 | 0.62 | −0.05 | 0.57 |
+| C3 | 0.46 | +0.05 | 0.51 |
+
+The hospital gap is gone, but the *diagnosis* gap survived: harmonized patients sit at 0.15–0.29 and controls at 0.45–0.57. That's the whole idea — **remove the microphone's accent, keep the singer's voice.**
+
+**Intuition.** For each brain measurement, each hospital gets its own "how much too high/low am I?" correction. ComBat [6] is the careful, grown-up version of our table arithmetic: it estimates a shift (and a stretch) per hospital per measurement, and it *shrinks* small hospitals' estimates toward the average — a hospital with only 8 scans has a noisy estimate, so we trust it less and borrow strength from the big hospitals. It also protects real group differences (age, sex, diagnosis) so they are not accidentally removed along with the site effect.
+
+**Notation, as shorthand for exactly the procedure above.** For measurement *g* of person *i* at hospital *s*:
+
+`adjusted = (value − γ_s) / δ_s`
+
+where `γ_s` is hospital *s*'s additive shift (the 0.05 we subtracted/added) and `δ_s` is a stretch factor (our tiny example had equal spreads, so δ = 1). The empirical-Bayes part just says: estimate γ and δ, then pull them partway toward the all-hospitals average before applying them. Nothing more.
+
+```mermaid
+flowchart TB
+    subgraph Before["Before ComBat"]
+        direction LR
+        A1["Hospital A readings<br/>clustered low"]
+        B1["Hospital B readings<br/>clustered high"]
+    end
+    Before -->|"estimate each site's shift γ and stretch δ,<br/>shrink toward the average, subtract/divide"| After
+    subgraph After["After ComBat"]
+        direction LR
+        A2["Hospital A readings"]
+        B2["Hospital B readings<br/>(now overlapping A)"]
+    end
+```
+
+## Leave-one-site-out: the "hide a hospital" test, on a tiny example
+
+How do you know whether a discovered effect is real biology or a local quirk? Test it somewhere the discovery process never saw. Here is the entire idea on our 6 people. Suppose hospitals A and B above are joined by a third hospital C with patients {0.18, 0.22} and controls {0.48, 0.52}.
+
+1. **Hide hospital C.** Using only A and B, we "discover": patients score lower than controls, by about 0.29 on average.
+2. **Reveal hospital C.** Check: at C, patients average 0.20 and controls 0.50 — lower, same direction, similar size. The effect **replicated** at a hospital it had never seen.
+3. **Repeat**, hiding A, then B. If the effect shows up every time, we trust it; if it only appears at the hospital where it was discovered, we don't.
+
+**Intuition.** This is cross-validation with the harshest possible split: instead of shuffling individual people, we hold out an entire hospital — its scanner, its staff, its patient recruitment — everything. Random splitting is like studying for an exam using last year's exact questions; leaving out a whole site is like being examined by a different school.
+
+**Notation.** With *N* hospitals, loop *s = 1…N*: discover on *N − 1* sites, evaluate on site *s*, and average the *N* scores. That's LOSO (leave-one-site-out) cross-validation — the loop in the diagram below and the backbone of this repository.
+
+## Scoring replication without prerequisites
+
+For each published MDD connectivity finding, the LOSO loop produces numbers, and we summarize them with three scores, each defined by what you'd do with paper and pencil:
+
+- **Sign consistency.** The discovery said "this connection is *lower* in patients." At the hidden hospital, is it actually lower? Count the fraction of held-out hospitals where the direction matches. In our tiny example, 3 out of 3 → sign consistency 1.0. A coin-flip effect scores ≈ 0.5; the synthetic demo scores 0.760.
+- **Effect-map correlation.** A finding is rarely one number — it's a *pattern* over many connections (a map). Lay the discovered map and the held-out hospital's map side by side and ask: when one is high, is the other high? That "do they rise and fall together" number is a correlation, between −1 (perfectly opposed) and +1 (perfectly matching).
+- **Held-out significance.** Is the patient–control gap at the hidden hospital larger than you'd expect if diagnosis labels were meaningless? The check: shuffle the labels at that hospital many times, recompute the gap each time, and see how often the shuffled gaps beat the real one. If almost never, the effect is "significant" there. No formulas required — it's a counting argument.
+
+## What this project does, end to end
 
 This repository builds a **fair test of whether brain findings travel**. Concretely:
 
 1. Take resting-state connectivity features from many scanning sites (target: REST-meta-MDD Phase II, ~2,400 subjects, ~25 sites [8]; current demo runs on synthetic data).
-2. **Harmonize** them with ComBat so site-specific "microphone" quirks are removed while real biological differences are preserved.
-3. Run a **leave-one-site-out (LOSO)** loop: pretend one hospital doesn't exist, discover the case–control effects on the remaining sites, then ask whether those effects show up at the hidden hospital. Repeat, hiding each site in turn.
-4. Score replication with three metrics (sign consistency, effect-map correlation, held-out significance) against a registry of 8 published MDD connectivity findings.
+2. **Harmonize** them with ComBat, exactly as in the tiny table above, so site-specific "microphone" quirks are removed while real biological differences are preserved.
+3. Run the **LOSO loop**: pretend one hospital doesn't exist, discover the case–control effects on the remaining sites, then ask whether those effects show up at the hidden hospital. Repeat, hiding each site in turn.
+4. Score replication with the three metrics above against a registry of 8 published MDD connectivity findings.
 
 ```mermaid
 flowchart LR
     subgraph Data["Multi-site resting-state data"]
         S1[Site 1] & S2[Site 2] & S3["..."] & SN[Site N]
     end
-    Data --> CB[ComBat harmonization<br/>remove site offsets/scales]
+    Data --> CB[ComBat harmonization<br/>remove site shifts/stretches]
     CB --> LOOP
     subgraph LOOP["LOSO loop (repeat for every site)"]
         TR[Discover effects<br/>on N-1 sites] --> TS[Test on the<br/>held-out site]
@@ -66,28 +150,9 @@ flowchart LR
     LOOP --> M["Replication metrics:<br/>sign consistency · effect-map correlation<br/>held-out significance"]
 ```
 
-```mermaid
-flowchart TB
-    subgraph Before["Before ComBat"]
-        direction LR
-        A1["Site A cloud<br/>(shifted up)"] 
-        B1["Site B cloud<br/>(shifted down)"]
-    end
-    Before -->|estimate each site's additive offset γ and multiplicative scale δ,<br/>shrink them by empirical Bayes, subtract/divide| After
-    subgraph After["After ComBat"]
-        direction LR
-        A2["Site A cloud"] 
-        B2["Site B cloud<br/>(overlapping A)"]
-    end
-```
+## A word on effect size
 
-## The math, in one sentence each
-
-- **Effect size (Cohen's d):** how far apart the patient and control averages are, measured in units of their shared spread — "the groups differ by half a standard deviation" means d = 0.5. Primer: [StatQuest — Cohen's d](https://statquest.org/).
-- **Correlation:** a number from −1 to +1 saying how tightly two quantities move together; we use it to ask whether the *pattern* of effects found at training sites matches the pattern at the held-out site. Primer: [Seeing Theory — correlation](https://seeing-theory.brown.edu/) and [3Blue1Brown](https://www.3blue1brown.com/).
-- **ComBat location/scale adjustment:** for each feature, ComBat estimates each site's additive offset γ and multiplicative scale δ and removes them, roughly `adjusted = (value − γ_site) / δ_site`, where γ and δ are *shrunk* toward the average across sites using empirical Bayes — small sites borrow strength from large ones instead of trusting their own noisy estimates [6]. Background on priors/shrinkage: [Khan Academy — statistics](https://www.khanacademy.org/math/statistics-probability) and StatQuest's empirical Bayes videos.
-
-We deliberately link out for the fundamentals rather than re-teaching them; the repo's own implementation notes live in [METHODS.md](METHODS.md).
+One last number appears everywhere in this project, and it is as concrete as the rest. In the harmonized tiny table, patients average (0.15+0.25+0.29)/3 ≈ 0.23 and controls ≈ 0.51 — a gap of 0.28. Is that "big"? Depends on how spread out people are: a 0.28 gap means a lot if everyone sits within ±0.05 of their group average, and little if people scatter by ±0.5. **Cohen's d** is just the gap divided by that typical spread. "d = 0.5" literally means "the groups' averages are half a typical scatter apart." Every effect in our registry is reported this way so that findings are comparable across sites, studies, and measures.
 
 ## The three-paper series
 
