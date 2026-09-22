@@ -2,6 +2,21 @@
 
 **Series note:** This is **Paper 1 of 3** in the MDD subtyping series. It is the **foundation paper**: it builds the harmonized REST-meta-MDD Phase II dataset and the replication-analysis framework that Paper 2 (`mdd-connectivity-subtypes`) and Paper 3 (`mdd-ssri-response-prediction`) directly reuse.
 
+## Concept figure
+
+The pipeline in one picture — multi-site resting-state data are harmonized with ComBat, every published finding is stress-tested by hiding one hospital at a time (LOSO), and the scores become a reusable benchmark (standalone version: [figures/concept_figure.md](figures/concept_figure.md)):
+
+```mermaid
+flowchart LR
+    subgraph D["Multi-site resting-state fMRI"]
+        S1["Site 1"] & S2["Site 2"] & SN["... Site 25"]
+    end
+    D --> CB["ComBat harmonization<br/>remove site shifts"]
+    CB --> LV["LOSO cross-validation<br/>hide one site per round"]
+    LV --> RM["Replication metrics<br/>sign · map correlation · significance"]
+    RM --> RB["Reusable benchmark for<br/>subtyping & prediction papers"]
+```
+
 ## Background
 
 Major depressive disorder (MDD) is one of the most common and disabling psychiatric conditions worldwide, yet its pathophysiology remains poorly understood. A central obstacle is heterogeneity: two patients meeting the same diagnostic criteria may differ profoundly in symptom profile, course, treatment response, and — presumably — neurobiology. Case–control studies that average across this heterogeneity risk detecting effects that describe no individual patient, motivating a move toward data-driven subtyping ("biotyping") of depression.
