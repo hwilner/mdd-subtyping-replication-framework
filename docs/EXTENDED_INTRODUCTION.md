@@ -89,9 +89,11 @@ The hospital gap is gone, but the *diagnosis* gap survived: harmonized patients 
 
 **Notation, as shorthand for exactly the procedure above.** For measurement *g* of person *i* at hospital *s*:
 
-`adjusted = (value − γ_s) / δ_s`
+```math
+\text{adjusted} = (\text{value} - \gamma_s) / \delta_s
+```
 
-where `γ_s` is hospital *s*'s additive shift (the 0.05 we subtracted/added) and `δ_s` is a stretch factor (our tiny example had equal spreads, so δ = 1). The empirical-Bayes part just says: estimate γ and δ, then pull them partway toward the all-hospitals average before applying them. Nothing more.
+where $`\gamma_s`$ is hospital *s*'s additive shift (the 0.05 we subtracted/added) and $`\delta_s`$ is a stretch factor (our tiny example had equal spreads, so $`\delta = 1`$). The empirical-Bayes part just says: estimate $`\gamma`$ and $`\delta`$, then pull them partway toward the all-hospitals average before applying them. Nothing more.
 
 ```mermaid
 flowchart TB
@@ -112,7 +114,7 @@ flowchart TB
 
 How do you know whether a discovered effect is real biology or a local quirk? Test it somewhere the discovery process never saw. Here is the entire idea on our 6 people. Suppose hospitals A and B above are joined by a third hospital C with patients {0.18, 0.22} and controls {0.48, 0.52}.
 
-1. **Hide hospital C.** Using only A and B, we "discover": patients score lower than controls, by about 0.29 on average.
+1. **Hide hospital C.** Using only A and B, we "discover": patients score lower than controls, by about 0.28 on average.
 2. **Reveal hospital C.** Check: at C, patients average 0.20 and controls 0.50 — lower, same direction, similar size. The effect **replicated** at a hospital it had never seen.
 3. **Repeat**, hiding A, then B. If the effect shows up every time, we trust it; if it only appears at the hospital where it was discovered, we don't.
 
@@ -132,7 +134,7 @@ For each published MDD connectivity finding, the LOSO loop produces numbers, and
 
 This repository builds a **fair test of whether brain findings travel**. Concretely:
 
-1. Take resting-state connectivity features from many scanning sites (target: REST-meta-MDD Phase II, ~2,400 subjects, ~25 sites [8]; current demo runs on synthetic data).
+1. Take resting-state connectivity features from many scanning sites (target: REST-meta-MDD Phase II, ~2,400 subjects, ~25 sites [7]; current demo runs on synthetic data).
 2. **Harmonize** them with ComBat, exactly as in the tiny table above, so site-specific "microphone" quirks are removed while real biological differences are preserved.
 3. Run the **LOSO loop**: pretend one hospital doesn't exist, discover the case–control effects on the remaining sites, then ask whether those effects show up at the hidden hospital. Repeat, hiding each site in turn.
 4. Score replication with the three metrics above against a registry of 8 published MDD connectivity findings.
@@ -176,4 +178,4 @@ The framework — ComBat harmonization, the LOSO loop, the findings registry, st
 4. Dinga R, et al. Evaluating the evidence for biotypes of depression. *NeuroImage: Clinical* 2019;22:101796. doi:10.1016/j.nicl.2019.101796
 5. Varoquaux G. Cross-validation failure: small sample sizes lead to large error bars. *NeuroImage* 2018;180:68–77. doi:10.1016/j.neuroimage.2017.06.061
 6. Fortin J-P, et al. Harmonization of cortical thickness measurements across scanners and sites. *NeuroImage* 2018;167:104–120. doi:10.1016/j.neuroimage.2017.11.024
-8. Chen X, et al. The DIRECT consortium and the REST-meta-MDD project. *Psychoradiology* 2022;2(1):32–42. doi:10.1093/psyrad/kkac005
+7. Chen X, et al. The DIRECT consortium and the REST-meta-MDD project. *Psychoradiology* 2022;2(1):32–42. doi:10.1093/psyrad/kkac005
