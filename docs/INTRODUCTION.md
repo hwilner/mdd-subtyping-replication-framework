@@ -27,7 +27,7 @@ The field has been shaped by a high-profile controversy. Drysdale et al. (2017) 
 
 The REST-meta-MDD Project, organized by the DIRECT consortium, was created to address exactly this problem [1][8]. Twenty-five research groups in China contributed R-fMRI data preprocessed locally with a standardized protocol and shared as derived indices (ALFF, ReHo, FC matrices), enabling large-scale mega-analysis while protecting privacy. The Phase I paper (1,300 MDD patients, 1,128 controls) found reduced — not increased — DMN connectivity in recurrent MDD, showing how large, harmonized samples can overturn conclusions from smaller studies [1]. REST-meta-MDD Phase II (~2,400 subjects, ~25 sites) extends this resource with harmonized resting-state fMRI and richer phenotyping [8], offering a rare testbed for studying cross-site reproducibility itself.
 
-Two methodological developments are central to this paper. First, harmonization: ComBat, an empirical Bayes batch-adjustment method imported from genomics, effectively removes scanner/site effects from multi-site MRI features while preserving biological variance of interest [6]. Second, honest evaluation: leave-one-site-out (LOSO) cross-validation, in which all discovery is performed on N−1 sites and testing on the fully held-out site, provides a far more realistic estimate of generalization than random-fold cross-validation and is increasingly considered the minimum standard for multi-site neuroimaging claims.
+Two methodological developments are central to this paper. First, harmonization: ComBat, an empirical Bayes batch-adjustment method originally developed for microarray data [10] and since adapted to neuroimaging, effectively removes scanner/site effects from multi-site MRI features while preserving biological variance of interest [6]. Second, honest evaluation: leave-one-site-out (LOSO) cross-validation, in which all discovery is performed on N−1 sites and testing on the fully held-out site, provides a far more realistic estimate of generalization than random-fold cross-validation and is increasingly considered the minimum standard for multi-site neuroimaging claims.
 
 ## Prior work and gap
 
@@ -48,7 +48,7 @@ Prior multi-site efforts have either meta-analyzed published peaks [2] or pooled
 ## Methods
 
 - Ingestion and QC of REST-meta-MDD Phase II derived indices; exclusion rules mirroring the consortium protocol (head motion, coverage, preprocessing residuals) [1].
-- Cross-site harmonization of connectivity features with ComBat, with covariate protection of age, sex, and diagnostic effects [6]; comparison against unharmonized and within-site standardized baselines.
+- Cross-site harmonization of connectivity features with ComBat, with covariate protection of age, sex, and diagnostic effects [6][10]; comparison against unharmonized and within-site standardized baselines.
 - Replication battery: a preregistered set of published MDD connectivity findings (DMN within-network FC, DMN–frontoparietal coupling, limbic–cortical edges) tested per site, with effect-size concordance and sign-consistency metrics.
 - Leave-one-site-out replication framework: discovery on N−1 sites, evaluation on the held-out site, iterated over all sites; uncertainty quantified per Varoquaux [5].
 - Synthetic-data unit tests with known site effects and known effect sizes to validate the framework's calibration before it is applied to real data.
@@ -76,3 +76,4 @@ Prior multi-site efforts have either meta-analyzed published peaks [2] or pooled
 7. Marquand AF, Rezek I, Buitelaar J, Beckmann CF. Understanding heterogeneity in clinical cohorts using normative models: beyond case–control studies. *Biological Psychiatry* 2016;80(7):552–561. doi:10.1016/j.biopsych.2015.12.023
 8. Chen X, Lu B, Li H-X, et al. The DIRECT consortium and the REST-meta-MDD project: towards neuroimaging biomarkers of major depressive disorder. *Psychoradiology* 2022;2(1):32–42. doi:10.1093/psyrad/kkac005
 9. Varol E, Sotiras A, Davatzikos C. HYDRA: revealing heterogeneity of imaging and genetic patterns through a multiple max-margin discriminative analysis framework. *NeuroImage* 2017;145:346–364. doi:10.1016/j.neuroimage.2016.02.041
+10. Johnson WE, Li C, Rabinovic A. Adjusting batch effects in microarray expression data using empirical Bayes methods. *Biostatistics* 2007;8(1):118–127. doi:10.1093/biostatistics/kxj037
