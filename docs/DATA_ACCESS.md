@@ -1,7 +1,7 @@
 # Data access: REST-meta-MDD Phase II
 
 All real-data work in this repository (harmonization QC, the LOSO benchmark
-on real data, and the Paper 1 writeup) is **blocked** until the REST-meta-MDD
+on real data, and the writeup) is **blocked** until the REST-meta-MDD
 Phase II Data Use Agreement (DUA) is approved. The data are **not** and must
 **never** be committed to this repository.
 
@@ -25,7 +25,7 @@ REST-meta-MDD Phase II is distributed through the **R-fMRI Maps Project**
    redistribution.
 2. **Prepare the application**: applicant name, institutional affiliation,
    institutional email, brief project description (cite this repository and
-   the Paper 1 goal: harmonization resource + LOSO replication benchmark).
+   the project goal: harmonization resource + LOSO replication benchmark).
 3. **Submit the DUA** via the R-fMRI Maps Project portal and record the
    submission date in issue `mdd-p1-dua-access`.
 4. **Track approval**; response typically takes days to a few weeks.

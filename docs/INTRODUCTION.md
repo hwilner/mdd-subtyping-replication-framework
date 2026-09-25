@@ -1,7 +1,5 @@
 # Introduction — MDD Subtyping Replication Framework
 
-**Series note:** This is **Paper 1 of 3** in the MDD subtyping series. It is the **foundation paper**: it builds the harmonized REST-meta-MDD Phase II dataset and the replication-analysis framework that Paper 2 (`mdd-connectivity-subtypes`) and Paper 3 (`mdd-ssri-response-prediction`) directly reuse.
-
 ## Concept figure
 
 The pipeline in one picture — multi-site resting-state data are harmonized with ComBat, every published finding is stress-tested by hiding one hospital at a time (LOSO), and the scores become a reusable benchmark (standalone version: [figures/concept_figure.md](figures/concept_figure.md)):
@@ -50,11 +48,11 @@ Prior multi-site efforts have either meta-analyzed published peaks [2] or pooled
 
 - A harmonized, QC'd REST-meta-MDD Phase II connectivity resource with documented batch-effect diagnostics and code.
 - An empirical map of which canonical MDD connectivity findings do and do not replicate across sites, contextualizing the entire series.
-- An open leave-one-site-out replication-benchmark framework (code + scoring rules) reused by Paper 2 (`mdd-connectivity-subtypes`) for subtype validation and by Paper 3 (`mdd-ssri-response-prediction`) for treatment-response prediction.
+- An open leave-one-site-out replication-benchmark framework (code + scoring rules) designed for reuse in subtype-validation and treatment-response studies.
 
 ## Scope and boundary
 
-- No new subtype discovery here (that is Paper 2); no treatment-response prediction (that is Paper 3).
+- No new subtype discovery and no treatment-response prediction here; both are left to later work.
 - Only resting-state fMRI from REST-meta-MDD; no external cohorts, no task fMRI, no structural MRI endpoints in this paper.
 - We do not claim new disease biology; the contribution is measurement and methodology — establishing what is reproducible before attempting to explain it.
 

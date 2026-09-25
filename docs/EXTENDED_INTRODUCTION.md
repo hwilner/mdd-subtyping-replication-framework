@@ -2,7 +2,7 @@
 
 This page explains the project from absolute zero. No statistics or medical background is assumed: every technical idea is first shown on a tiny made-up example you can check by hand, then given intuition, and only then named. If you already know what fMRI and resting-state connectivity are, you probably want [INTRODUCTION.md](INTRODUCTION.md) (the scientific introduction) instead.
 
-**Concept figure.** The whole pipeline in one picture — multi-site data in, harmonization, hide-one-hospital testing, replication scoring, and a benchmark the rest of the series reuses (standalone version: [figures/concept_figure.md](figures/concept_figure.md)):
+**Concept figure.** The whole pipeline in one picture — multi-site data in, harmonization, hide-one-hospital testing, replication scoring, and a reusable benchmark (standalone version: [figures/concept_figure.md](figures/concept_figure.md)):
 
 ```mermaid
 flowchart LR
@@ -156,15 +156,6 @@ flowchart LR
 
 One last number appears everywhere in this project, and it is as concrete as the rest. In the harmonized tiny table, patients average (0.15+0.25+0.29)/3 ≈ 0.23 and controls ≈ 0.51 — a gap of 0.28. Is that "big"? Depends on how spread out people are: a 0.28 gap means a lot if everyone sits within ±0.05 of their group average, and little if people scatter by ±0.5. **Cohen's d** is just the gap divided by that typical spread. "d = 0.5" literally means "the groups' averages are half a typical scatter apart." Every effect in our registry is reported this way so that findings are comparable across sites, studies, and measures.
 
-## The three-paper series
-
-This repository is Paper 1 of 3 — the foundation that the others reuse.
-
-```mermaid
-flowchart LR
-    P1["Paper 1 (this repo)<br/>mdd-subtyping-replication-framework<br/>harmonization + LOSO replication benchmark"] --> P2["Paper 2<br/>mdd-connectivity-subtypes<br/>subtype discovery, validated on P1's benchmark"]
-    P1 --> P3["Paper 3<br/>mdd-ssri-response-prediction<br/>treatment-response prediction, honestly evaluated via LOSO"]
-```
 
 ## Where the project stands
 

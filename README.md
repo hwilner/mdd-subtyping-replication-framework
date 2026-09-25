@@ -1,10 +1,6 @@
-# MDD Subtyping-with-Replication Framework (Paper 1)
+# MDD Subtyping-with-Replication Framework 
 
 This independent research repository plans and tracks a subtyping framework with leave-one-site-out replication built in by design, benchmarked on REST-meta-MDD Phase II. It provides harmonization and clustering utilities for transparent review and extension.
-
-## Series position
-
-This is **Paper 1** of the MDD subtyping series (3 papers). It is the foundation of the series; Papers 2–3 build on its framework, splits, and harmonized features.
 
 ## Research plan
 
@@ -13,7 +9,7 @@ This is **Paper 1** of the MDD subtyping series (3 papers). It is the foundation
 | REST-meta-MDD Phase II access (open DUA) + harmonization (ComBat) | Versioned voxel/vertex-level features, 23 cohorts. |
 | Subtyping-with-replication framework (normative deviations + HYDRA/Surreal-GAN-style clustering) | Method + open benchmark. |
 | Leave-one-site-out replication stress test | Replication-rate results for our and published subtype schemes. |
-| Release framework harness | Reused by Papers 2–3. |
+| Release framework harness | Reusable by later work. |
 
 **Current status:** framework implemented and validated on synthetic data; post-DUA staging (`scripts/prepare_rest_meta_mdd.py`) and the one-command LOSO benchmark runner (`scripts/run_loso.py`) are in place and run end-to-end in `--synthetic` demo mode (demo outputs in `reports/loso/`). Real-data execution is gated only on DUA approval (issue #2); no real-data analysis has been run.
 

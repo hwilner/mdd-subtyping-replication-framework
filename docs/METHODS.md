@@ -21,7 +21,7 @@ Audience: new contributors, including those new to data science. This document s
 | REST-meta-MDD Phase II DUA submission/approval | issue #2 | Owner action — see [DATA_ACCESS.md](DATA_ACCESS.md) |
 | Real-data harmonization QC and batch-effect diagnostics | issue #5 | DUA |
 | Real-data LOSO benchmark (~25 sites) | issue #3 | DUA |
-| Paper 1 writeup and release | issue #4 | DUA + benchmark |
+| Writeup and release | issue #4 | DUA + benchmark |
 
 No real-data analysis has been run. Real data must never be committed to this repository.
 
