@@ -38,6 +38,11 @@ from loso_replication.staging import (  # noqa: E402
 
 
 def main() -> int:
+    """Main.
+
+    Returns:
+        int: the result.
+    """
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data-root", required=True)
     ap.add_argument("--modality", default="FC", choices=["FC", "ALFF", "ReHo"])

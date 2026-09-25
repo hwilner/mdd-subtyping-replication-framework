@@ -80,14 +80,29 @@ class LosoResult:
 
     @property
     def mean_sign_consistency(self) -> float:
+        """Mean sign consistency.
+
+        Returns:
+            float: the sign consistency.
+        """
         return float(np.mean([f.sign_consistency for f in self.folds]))
 
     @property
     def mean_effect_map_correlation(self) -> float:
+        """Mean effect map correlation.
+
+        Returns:
+            float: the effect map correlation.
+        """
         return float(np.mean([f.effect_map_correlation for f in self.folds]))
 
     @property
     def mean_heldout_significance(self) -> float:
+        """Mean heldout significance.
+
+        Returns:
+            float: the heldout significance.
+        """
         return float(np.mean([f.heldout_significance for f in self.folds]))
 
 
@@ -106,6 +121,13 @@ class LosoReplicator:
     """
 
     def __init__(self, alpha: float = 0.05, min_train_sites: int = 2, harmonize=None):
+        """Initialize the instance.
+
+        Args:
+            alpha (float): alpha.
+            min_train_sites (int): min train sites.
+            harmonize: harmonize.
+        """
         self.alpha = alpha
         self.min_train_sites = min_train_sites
         self.harmonize = harmonize

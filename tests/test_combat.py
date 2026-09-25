@@ -1,5 +1,4 @@
-"""ComBat must remove planted site batch effects while preserving the
-planted biological (case-control) effect."""
+"""ComBat must remove planted site batch effects while preserving the planted biological (case-control) effect."""
 
 import numpy as np
 import pytest
@@ -11,6 +10,11 @@ from loso_replication.simulate import simulate_multisite
 
 @pytest.fixture()
 def dataset():
+    """Dataset.
+
+    Returns:
+    The result.
+    """
     return simulate_multisite(seed=42)
 
 
@@ -19,6 +23,11 @@ def _site_means(X, sites):
 
 
 def test_combat_removes_planted_site_effects(dataset):
+    """Test combat removes planted site effects.
+
+    Args:
+    dataset: dataset.
+    """
     X = dataset.X.to_numpy()
     sites = dataset.sites
     before = _site_means(X, sites).var(axis=0).mean()
@@ -30,6 +39,11 @@ def test_combat_removes_planted_site_effects(dataset):
 
 
 def test_combat_preserves_biological_effect(dataset):
+    """Test combat preserves biological effect.
+
+    Args:
+    dataset: dataset.
+    """
     rep_idx = [dataset.X.columns.get_loc(c) for c in dataset.replicable_features]
     X = dataset.X.to_numpy()
     d_before, _ = effect_sizes(X, dataset.y)
@@ -42,6 +56,11 @@ def test_combat_preserves_biological_effect(dataset):
 
 
 def test_combat_accepts_dataframe_and_matches_array(dataset):
+    """Test combat accepts dataframe and matches array.
+
+    Args:
+    dataset: dataset.
+    """
     df_out = combat(dataset.X, dataset.sites, prefer_neurocombat=False)
     arr_out = combat(dataset.X.to_numpy(), dataset.sites, prefer_neurocombat=False)
     assert np.allclose(df_out.to_numpy(), arr_out)
@@ -49,6 +68,7 @@ def test_combat_accepts_dataframe_and_matches_array(dataset):
 
 
 def test_combat_single_site_is_identity():
+    """Test combat single site is identity."""
     X = np.random.default_rng(0).normal(size=(10, 5))
     out = combat(X, np.array(["a"] * 10))
     assert np.allclose(out, X)

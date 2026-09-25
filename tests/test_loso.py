@@ -1,5 +1,4 @@
-"""LOSO framework on synthetic data must recover the planted replicable
-effect and flag the planted non-replicable effect."""
+"""LOSO framework on synthetic data must recover the planted replicable effect and flag the planted non-replicable effect."""
 
 import numpy as np
 import pytest
@@ -11,16 +10,35 @@ from loso_replication.simulate import simulate_multisite
 
 @pytest.fixture(scope="module")
 def dataset():
+    """Dataset.
+
+    Returns:
+    The result.
+    """
     return simulate_multisite(seed=7)
 
 
 @pytest.fixture(scope="module")
 def result(dataset):
+    """Result.
+
+    Args:
+    dataset: dataset.
+
+    Returns:
+    The result.
+    """
     X_h = np.asarray(combat(dataset.X, dataset.sites, prefer_neurocombat=False))
     return LosoReplicator(alpha=0.05).run(X_h, dataset.y, dataset.sites)
 
 
 def test_all_sites_get_a_fold(dataset, result):
+    """Test all sites get a fold.
+
+    Args:
+    dataset: dataset.
+    result: result.
+    """
     assert len(result.folds) == len(np.unique(dataset.sites))
     summary = result.summary()
     assert set(summary.columns) >= {
@@ -41,6 +59,12 @@ def test_replicable_effect_detected(dataset, result):
 
 
 def test_replication_metrics_high_for_planted_effect(dataset, result):
+    """Test replication metrics high for planted effect.
+
+    Args:
+    dataset: dataset.
+    result: result.
+    """
     rep_idx = [dataset.X.columns.get_loc(c) for c in dataset.replicable_features]
     corrs = []
     for fold in result.folds:
@@ -83,6 +107,7 @@ def test_null_features_no_false_discovery(dataset):
 
 
 def test_effect_sizes_requires_two_groups():
+    """Test effect sizes requires two groups."""
     X = np.zeros((4, 3))
     with pytest.raises(ValueError):
         effect_sizes(X, np.array([1, 1, 1, 1]))

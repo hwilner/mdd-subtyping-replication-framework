@@ -9,6 +9,7 @@ from loso_replication.simulate import simulate_multisite
 
 
 def test_findings_registry_wellformed():
+    """Test findings registry wellformed."""
     keys = [f.key for f in FINDINGS]
     assert len(keys) == len(set(keys))
     assert all(f.direction in (-1, 1) for f in FINDINGS)
@@ -20,6 +21,11 @@ def test_findings_registry_wellformed():
 
 
 def test_io_requires_dua(tmp_path):
+    """Test io requires dua.
+
+    Args:
+        tmp_path: tmp path.
+    """
     with pytest.raises(DataAccessError, match="Data Use Agreement"):
         load_features()
     with pytest.raises(DataAccessError):
@@ -31,6 +37,11 @@ def test_io_requires_dua(tmp_path):
 
 
 def test_io_roundtrip_after_dua(tmp_path):
+    """Test io roundtrip after dua.
+
+    Args:
+        tmp_path: tmp path.
+    """
     ds = simulate_multisite(n_sites=3, n_per_site=10, n_features=8,
                             n_replicable=2, n_nonreplicable=2, seed=1)
     pheno = ds.X.copy()
@@ -49,6 +60,7 @@ def test_io_roundtrip_after_dua(tmp_path):
 
 
 def test_simulator_ground_truth_partition():
+    """Test simulator ground truth partition."""
     ds = simulate_multisite(seed=3)
     feats = set(ds.X.columns)
     assert set(ds.replicable_features) | set(ds.nonreplicable_features) | set(ds.null_features) == feats

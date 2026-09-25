@@ -19,20 +19,20 @@ __all__ = ["Finding", "FINDINGS", "findings_table", "get_finding"]
 class Finding:
     """A published case-control connectivity effect to replicate.
 
-    Attributes
+    Attributes:
     ----------
     key:
-        Stable identifier, e.g. ``"yan2019_dmn_pcc_hypo"``.
+    Stable identifier, e.g. ``"yan2019_dmn_pcc_hypo"``.
     feature:
-        Feature name in the harmonized feature matrix.
+    Feature name in the harmonized feature matrix.
     direction:
-        Expected sign of the case-control effect: ``+1`` hyper-, ``-1`` hypo-.
+    Expected sign of the case-control effect: ``+1`` hyper-, ``-1`` hypo-.
     modality:
-        Feature modality: ``"FC"``, ``"ALFF"`` or ``"ReHo"``.
+    Feature modality: ``"FC"``, ``"ALFF"`` or ``"ReHo"``.
     citation:
-        Short citation for the source report.
+    Short citation for the source report.
     doi:
-        DOI of the source publication.
+    DOI of the source publication.
     """
 
     key: str

@@ -119,16 +119,16 @@ def combat(
     Parameters
     ----------
     data:
-        (n_samples, n_features) matrix of connectivity/ALFF/ReHo features.
+    (n_samples, n_features) matrix of connectivity/ALFF/ReHo features.
     sites:
-        Length-n_samples site label per row.
+    Length-n_samples site label per row.
     ref_batch:
-        Optional site to treat as the reference batch.
+    Optional site to treat as the reference batch.
     prefer_neurocombat:
-        Use the optional ``neuroCombat`` package when available; otherwise
-        fall back to the built-in empirical-Bayes implementation.
+    Use the optional ``neuroCombat`` package when available; otherwise
+    fall back to the built-in empirical-Bayes implementation.
 
-    Returns
+    Returns:
     -------
     Harmonized matrix, same type/shape as ``data``.
     """
@@ -152,9 +152,23 @@ class CombatHarmonizer:
     """Small sklearn-style wrapper around :func:`combat`."""
 
     def __init__(self, prefer_neurocombat: bool = True):
+        """Initialize the instance.
+
+        Args:
+        prefer_neurocombat (bool): prefer neurocombat.
+        """
         self.prefer_neurocombat = prefer_neurocombat
 
     def fit_transform(self, data, sites):
+        """Fit transform.
+
+        Args:
+        data: data.
+        sites: sites.
+
+        Returns:
+        The transform.
+        """
         return combat(data, sites, prefer_neurocombat=self.prefer_neurocombat)
 
     # ComBat requires batch labels for new data; kept for API symmetry.

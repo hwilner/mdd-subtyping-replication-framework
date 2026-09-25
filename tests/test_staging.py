@@ -17,6 +17,11 @@ from loso_replication.staging import (
 
 
 def test_stage_synthetic_demo_roundtrip(tmp_path):
+    """Test stage synthetic demo roundtrip.
+
+    Args:
+        tmp_path: tmp path.
+    """
     report = stage_synthetic_demo(tmp_path, n_sites=4, n_per_site=15,
                                   n_features=20, seed=3)
     assert report["synthetic"] is True
@@ -31,11 +36,21 @@ def test_stage_synthetic_demo_roundtrip(tmp_path):
 
 
 def test_validate_rejects_missing_files(tmp_path):
+    """Test validate rejects missing files.
+
+    Args:
+        tmp_path: tmp path.
+    """
     with pytest.raises(StagingError, match="phenotypes.csv"):
         validate_staged(tmp_path)
 
 
 def test_validate_rejects_bad_diagnosis(tmp_path):
+    """Test validate rejects bad diagnosis.
+
+    Args:
+        tmp_path: tmp path.
+    """
     pd.DataFrame(
         {"subject": ["a", "b"], "site": ["s1", "s2"], "diagnosis": [0, 7]}
     ).to_csv(tmp_path / "phenotypes.csv", index=False)
@@ -47,6 +62,11 @@ def test_validate_rejects_bad_diagnosis(tmp_path):
 
 
 def test_validate_rejects_unmatched_subjects(tmp_path):
+    """Test validate rejects unmatched subjects.
+
+    Args:
+        tmp_path: tmp path.
+    """
     pd.DataFrame(
         {"subject": ["a", "b"], "site": ["s1", "s2"], "diagnosis": [0, 1]}
     ).to_csv(tmp_path / "phenotypes.csv", index=False)

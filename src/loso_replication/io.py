@@ -26,8 +26,7 @@ _DUA_MESSAGE = (
 
 
 class DataAccessError(RuntimeError):
-    """Raised when REST-meta-MDD Phase II data are requested without an
-    approved DUA / local data root."""
+    """Raised when REST-meta-MDD Phase II data are requested without an approved DUA / local data root."""
 
 
 def _require_data_root(data_root: str | Path | None) -> Path:
@@ -50,10 +49,10 @@ def load_features(
     Parameters
     ----------
     data_root:
-        Local directory containing the REST-meta-MDD Phase II derivatives
-        (only available after DUA approval).
+    Local directory containing the REST-meta-MDD Phase II derivatives
+    (only available after DUA approval).
     modality:
-        One of ``"FC"``, ``"ALFF"``, ``"ReHo"``.
+    One of ``"FC"``, ``"ALFF"``, ``"ReHo"``.
     """
     if modality not in {"FC", "ALFF", "ReHo"}:
         raise ValueError("modality must be one of 'FC', 'ALFF', 'ReHo'")
