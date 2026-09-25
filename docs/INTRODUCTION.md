@@ -6,16 +6,9 @@
 
 The pipeline in one picture — multi-site resting-state data are harmonized with ComBat, every published finding is stress-tested by hiding one hospital at a time (LOSO), and the scores become a reusable benchmark (standalone version: [figures/concept_figure.md](figures/concept_figure.md)):
 
-```mermaid
-flowchart LR
-    subgraph D["Multi-site resting-state fMRI"]
-        S1["Site 1"] & S2["Site 2"] & SN["... Site 25"]
-    end
-    D --> CB["ComBat harmonization<br/>remove site shifts"]
-    CB --> LV["LOSO cross-validation<br/>hide one site per round"]
-    LV --> RM["Replication metrics<br/>sign · map correlation · significance"]
-    RM --> RB["Reusable benchmark for<br/>subtyping & prediction papers"]
-```
+![Concept figure: scans from many hospitals are batch-harmonized, then every finding is stress-tested by hiding one hospital at a time](figures/01-concept-schematic.png)
+
+*Figure 1: Scans from many hospitals are batch-harmonized, then every finding is stress-tested by hiding one hospital at a time. (Editable Mermaid source: [figures/concept_figure.md](figures/concept_figure.md).)*
 
 ## Background
 
