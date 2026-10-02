@@ -60,10 +60,24 @@ class FoldResult:
 
 @dataclass
 class LosoResult:
-    """Aggregate result over all LOSO folds."""
+    """Aggregate result over all LOSO folds.
+
+    Attributes:
+        folds:
+            The folds that produced usable metrics, in held-out-site order.
+        alpha:
+            Nominal p-value threshold used to call a training effect
+            "significant".
+        skipped_sites:
+            Sites that were dropped because the remaining training sites did
+            not meet ``min_train_sites``. Recorded rather than discarded
+            silently, so a run cannot quietly report on a subset of the data
+            without saying so.
+    """
 
     folds: list[FoldResult]
     alpha: float
+    skipped_sites: list[str] = field(default_factory=list)
 
     def summary(self) -> pd.DataFrame:
         """Per-fold metrics as a DataFrame."""
@@ -78,32 +92,64 @@ class LosoResult:
             }
         )
 
-    @property
-    def mean_sign_consistency(self) -> float:
-        """Mean sign consistency.
+    def _defined_mean(self, values: list[float]) -> float:
+        """Mean over the folds where the metric is defined.
+
+        A fold leaves a metric undefined (NaN) when no effect is significant on
+        its training sites, or when the effect map has no variance. Averaging
+        those NaNs with ``np.mean`` would turn the whole reported metric into
+        NaN and silently discard every defined fold, so undefined folds are
+        skipped here instead.
+
+        Args:
+            values: The per-fold values of one metric.
 
         Returns:
-            float: the sign consistency.
+            float: The mean over defined folds, or NaN if none is defined.
         """
-        return float(np.mean([f.sign_consistency for f in self.folds]))
+        defined = [v for v in values if np.isfinite(v)]
+        if not defined:
+            return float("nan")
+        return float(np.mean(defined))
+
+    def n_defined(self, metric: str) -> int:
+        """Number of folds in which ``metric`` is defined (not NaN).
+
+        Args:
+            metric: One of ``"sign_consistency"``,
+                ``"effect_map_correlation"`` or ``"heldout_significance"``.
+
+        Returns:
+            int: The count of folds contributing to that metric's mean.
+        """
+        return int(sum(np.isfinite(getattr(f, metric)) for f in self.folds))
+
+    @property
+    def mean_sign_consistency(self) -> float:
+        """Mean sign consistency over the folds where it is defined.
+
+        Returns:
+            float: the sign consistency, or NaN if no fold defines it.
+        """
+        return self._defined_mean([f.sign_consistency for f in self.folds])
 
     @property
     def mean_effect_map_correlation(self) -> float:
-        """Mean effect map correlation.
+        """Mean effect map correlation over the folds where it is defined.
 
         Returns:
-            float: the effect map correlation.
+            float: the effect map correlation, or NaN if no fold defines it.
         """
-        return float(np.mean([f.effect_map_correlation for f in self.folds]))
+        return self._defined_mean([f.effect_map_correlation for f in self.folds])
 
     @property
     def mean_heldout_significance(self) -> float:
-        """Mean heldout significance.
+        """Mean heldout significance over the folds where it is defined.
 
         Returns:
-            float: the heldout significance.
+            float: the heldout significance, or NaN if no fold defines it.
         """
-        return float(np.mean([f.heldout_significance for f in self.folds]))
+        return self._defined_mean([f.heldout_significance for f in self.folds])
 
 
 class LosoReplicator:
@@ -114,7 +160,9 @@ class LosoReplicator:
     alpha:
         Nominal p-value threshold for "significant" effects.
     min_train_sites:
-        Minimum number of training sites required per fold.
+        Minimum number of training sites required per fold. Sites that cannot
+        meet it are recorded in ``LosoResult.skipped_sites`` rather than
+        dropped without trace.
     harmonize:
         Optional callable ``(X, sites) -> X_harmonized`` applied before
         splitting (e.g. :func:`loso_replication.combat.combat`).
@@ -153,6 +201,16 @@ class LosoReplicator:
             Binary labels, 1 = case (MDD), 0 = control.
         sites:
             Site label per sample.
+
+        Returns:
+            LosoResult: Per-fold metrics plus the sites that were skipped.
+
+        Raises:
+            ValueError: If no fold could be built at all — for example when
+                ``min_train_sites`` exceeds the number of sites available, or
+                when a site has too few cases or controls for ``effect_sizes``.
+                Returning an empty result here would produce a run summary
+                consisting entirely of nulls, so it is refused instead.
         """
         X_arr = X.to_numpy(dtype=float) if isinstance(X, pd.DataFrame) else np.asarray(X, dtype=float)
         y = np.asarray(y)
@@ -161,12 +219,20 @@ class LosoReplicator:
             X_arr = np.asarray(self.harmonize(X_arr, sites), dtype=float)
 
         folds: list[FoldResult] = []
+        skipped: list[str] = []
         for held, train_idx, test_idx in self.split_sites(sites):
             n_train_sites = len(np.unique(sites[train_idx]))
             if n_train_sites < self.min_train_sites:
+                skipped.append(held)
                 continue
-            d_train, p_train = effect_sizes(X_arr[train_idx], y[train_idx])
-            d_test, p_test = effect_sizes(X_arr[test_idx], y[test_idx])
+            try:
+                d_train, p_train = effect_sizes(X_arr[train_idx], y[train_idx])
+                d_test, p_test = effect_sizes(X_arr[test_idx], y[test_idx])
+            except ValueError:
+                # A site with too few cases or controls cannot yield effect
+                # sizes; record it rather than aborting the whole benchmark.
+                skipped.append(held)
+                continue
 
             sig_train = p_train < self.alpha
             if sig_train.sum() == 0:
@@ -190,4 +256,11 @@ class LosoReplicator:
                     test_p=p_test,
                 )
             )
-        return LosoResult(folds=folds, alpha=self.alpha)
+        if not folds:
+            raise ValueError(
+                f"No LOSO fold could be evaluated: {len(skipped)} site(s) skipped "
+                f"({skipped}). Check min_train_sites={self.min_train_sites} against "
+                f"the {len(np.unique(sites))} site(s) present, and that each site "
+                "has at least 2 cases and 2 controls."
+            )
+        return LosoResult(folds=folds, alpha=self.alpha, skipped_sites=skipped)

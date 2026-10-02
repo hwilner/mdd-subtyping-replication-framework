@@ -42,6 +42,28 @@ def _builtin_combat(
 
     Removes additive and multiplicative site effects while preserving the
     grand mean per feature. ``data`` is assumed already aligned column-wise.
+
+    Args:
+        data:
+            (n_samples, n_features) matrix of features to harmonize.
+        sites:
+            Length-n_samples site label per row; defines the batches.
+        ref_batch:
+            Optional site to hold out of the empirical-Bayes prior estimation.
+            The reference site is then shrunk toward the consensus of the
+            *other* sites rather than partly toward itself, so its corrected
+            values reflect the population rather than its own measurement
+            quirks. This mirrors the ``ref_batch`` semantics of the reference
+            ``neuroCombat`` implementation. When ``None`` (the default) the
+            prior is estimated from all sites, and the result is identical to
+            calling without this argument.
+
+    Returns:
+        np.ndarray: The harmonized matrix, same shape as ``data``.
+
+    Raises:
+        ValueError: If ``data`` is not 2-D, if ``sites`` has the wrong length,
+            or if ``ref_batch`` is not one of the sites present in ``sites``.
     """
     data = np.asarray(data, dtype=float)
     sites = np.asarray(sites)
@@ -52,11 +74,16 @@ def _builtin_combat(
 
     batch_levels, site_codes = np.unique(sites, return_inverse=True)
     n_batches = len(batch_levels)
+    # Validate ref_batch before the single-site early return so a typo is
+    # reported even when the data cannot be harmonized anyway.
+    ref_index: int | None = None
+    if ref_batch is not None:
+        matches = np.flatnonzero(batch_levels == ref_batch)
+        if matches.size == 0:
+            raise ValueError(f"ref_batch {ref_batch!r} not present in sites")
+        ref_index = int(matches[0])
     if n_batches < 2:
         return data.copy()
-    if ref_batch is not None:
-        if ref_batch not in set(batch_levels):
-            raise ValueError(f"ref_batch {ref_batch!r} not present in sites")
 
     n_samples, n_features = data.shape
     design = _design_matrix(site_codes, n_batches)
@@ -77,12 +104,26 @@ def _builtin_combat(
         gamma_hat[b] = batch_data.mean(axis=0)
         delta_hat[b] = np.maximum(batch_data.var(axis=0, ddof=1), 1e-12)
 
-    # Empirical-Bayes hyperparameters.
-    gamma_bar = gamma_hat.mean(axis=0)
-    t2 = np.maximum(gamma_hat.var(axis=0, ddof=1), 1e-12)
+    # Empirical-Bayes hyperparameters, estimated from the prior batches only.
+    # Excluding the reference batch (when one is named) is what makes
+    # ref_batch meaningful: the reference site is corrected using the other
+    # sites' consensus instead of being shrunk toward its own noisy estimate.
+    prior_mask = np.ones(n_batches, dtype=bool)
+    if ref_index is not None:
+        prior_mask[ref_index] = False
+    # A sample variance needs at least two batches; with a single prior batch
+    # the empirical-Bayes spread is unidentifiable, so fall back to all sites
+    # (equivalent to the default, ref_batch=None, behaviour).
+    if int(prior_mask.sum()) < 2:
+        prior_mask = np.ones(n_batches, dtype=bool)
+    gamma_prior = gamma_hat[prior_mask]
+    delta_prior = delta_hat[prior_mask]
+
+    gamma_bar = gamma_prior.mean(axis=0)
+    t2 = np.maximum(gamma_prior.var(axis=0, ddof=1), 1e-12)
     # Method-of-moments priors for inverse-gamma on delta.
-    delta_mean = delta_hat.mean(axis=0)
-    delta_var = np.maximum(delta_hat.var(axis=0, ddof=1), 1e-12)
+    delta_mean = delta_prior.mean(axis=0)
+    delta_var = np.maximum(delta_prior.var(axis=0, ddof=1), 1e-12)
     a_prior = delta_mean**2 / delta_var + 2.0
     b_prior = delta_mean * (delta_mean**2 / delta_var + 1.0)
 
@@ -119,14 +160,17 @@ def combat(
     Parameters
     ----------
     data:
-    (n_samples, n_features) matrix of connectivity/ALFF/ReHo features.
+        (n_samples, n_features) matrix of connectivity/ALFF/ReHo features.
     sites:
-    Length-n_samples site label per row.
+        Length-n_samples site label per row.
     ref_batch:
-    Optional site to treat as the reference batch.
+        Optional site to hold out of the empirical-Bayes prior estimation (see
+        :func:`_builtin_combat`). Naming a reference site forces the built-in
+        backend, because the optional ``neuroCombat`` package is only used on
+        the unconstrained default path.
     prefer_neurocombat:
-    Use the optional ``neuroCombat`` package when available; otherwise
-    fall back to the built-in empirical-Bayes implementation.
+        Use the optional ``neuroCombat`` package when available; otherwise
+        fall back to the built-in empirical-Bayes implementation.
 
     Returns:
     -------

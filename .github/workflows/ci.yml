@@ -1,0 +1,108 @@
+# Continuous integration for the LOSO replication framework.
+#
+# The repo had a test suite, a Makefile and a pytest configuration but no
+# workflow, so nothing ran the checks on push and silent failures reached main
+# unnoticed. This runs the unit/integration tests on every supported Python
+# and smoke-tests the staged demo pipeline end to end.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: pytest (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Matches requires-python = ">=3.10" in pyproject.toml.
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install package and dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      - name: Byte-compile all sources
+        run: python -m compileall -q src scripts tests
+
+      - name: Run test suite
+        run: python -m pytest -q --junitxml=pytest-report.xml
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report-py${{ matrix.python-version }}
+          path: pytest-report.xml
+          if-no-files-found: ignore
+
+  demo:
+    name: staged demo pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e "."
+
+      - name: Stage synthetic demo data and run the benchmark
+        # Mirrors `make benchmark-demo`, but writes the reports to a scratch
+        # directory so CI never dirties the committed reports/loso/ outputs.
+        run: |
+          python scripts/prepare_rest_meta_mdd.py --data-root "$RUNNER_TEMP/demo" --synthetic
+          python scripts/run_loso.py \
+            --data-root "$RUNNER_TEMP/demo" \
+            --reports-dir "$RUNNER_TEMP/reports"
+
+      - name: Assert the run summary records synthetic provenance
+        # Guards the DUA-relevant invariant: demo data must never be labelled
+        # as real data in a committed run summary.
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          path = os.path.join(os.environ["RUNNER_TEMP"], "reports", "loso_run_summary.json")
+          summary = json.load(open(path))
+          assert summary["synthetic"] is True, f"demo run labelled real: {summary}"
+          assert summary["provenance_source"] == "STAGING_REPORT.json", summary
+          assert summary["n_folds"] == summary["n_sites"], summary
+          print("run summary OK:", json.dumps(summary, indent=2))
+          PY
+
+      - name: Assert the committed demo reports still reproduce
+        # The committed reports/loso/ outputs are the only benchmark numbers in
+        # the repo, and docs/METHODS.md quotes them. If the default code path
+        # drifts, the documentation goes stale silently.
+        run: python scripts/check_demo_reproducibility.py
+
