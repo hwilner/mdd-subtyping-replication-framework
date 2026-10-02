@@ -32,10 +32,14 @@ from .simulate import simulate_multisite
 
 __all__ = [
     "EXPECTED_LAYOUT",
+    "STAGING_REPORT_NAME",
     "StagingError",
     "stage_synthetic_demo",
     "validate_staged",
     "load_staged_dataset",
+    "read_staging_report",
+    "read_synthetic_flag",
+    "write_staging_report",
 ]
 
 #: Files the staging step expects in the data root (see docs/DATA_ACCESS.md).
@@ -45,6 +49,9 @@ EXPECTED_LAYOUT = {
     "features_alff.csv": "subjects x features matrix, subject IDs as index",
     "features_reho.csv": "subjects x features matrix, subject IDs as index",
 }
+
+#: Name of the provenance record written into the data root by staging.
+STAGING_REPORT_NAME = "STAGING_REPORT.json"
 
 _MODALITY_FILES = {"FC": "features_fc.csv", "ALFF": "features_alff.csv",
                    "ReHo": "features_reho.csv"}
@@ -155,11 +162,71 @@ def stage_synthetic_demo(
     report["synthetic"] = True
     report["seed"] = seed
     report["replicable_features"] = ds.replicable_features
-    (root / "STAGING_REPORT.json").write_text(json.dumps(report, indent=2))
+    write_staging_report(root, report)
     return report
 
 
 def write_staging_report(data_root: str | Path, report: dict) -> Path:
-    path = Path(data_root) / "STAGING_REPORT.json"
-    path.write_text(json.dumps(report, indent=2))
+    """Write the staging report into the data root.
+
+    Args:
+        data_root: Directory holding the staged files.
+        report: The report dict to serialize.
+
+    Returns:
+        Path: The path the report was written to.
+    """
+    path = Path(data_root) / STAGING_REPORT_NAME
+    path.write_text(json.dumps(report, indent=2) + "\n")
     return path
+
+
+def read_staging_report(data_root: str | Path) -> dict:
+    """Read the staging report that records how the data root was staged.
+
+    Args:
+        data_root: Directory holding the staged files.
+
+    Returns:
+        dict: The parsed staging report.
+
+    Raises:
+        StagingError: If the report is missing, unreadable, not valid JSON, or
+            does not carry a boolean ``synthetic`` provenance field. Provenance
+            is never guessed: an unverified label is worse than an error,
+            because the DUA forbids presenting demo data as real data.
+    """
+    path = Path(data_root) / STAGING_REPORT_NAME
+    if not path.exists():
+        raise StagingError(
+            f"Missing provenance record {path}. Stage the data first with "
+            "scripts/prepare_rest_meta_mdd.py (add --synthetic for the demo "
+            "dataset) so the run summary can record whether these are demo or "
+            "real files."
+        )
+    try:
+        report = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as e:
+        raise StagingError(f"Cannot read provenance record {path}: {e}") from e
+    if not isinstance(report, dict) or not isinstance(report.get("synthetic"), bool):
+        raise StagingError(
+            f"{path} has no boolean 'synthetic' field; refusing to record an "
+            "unverified data provenance in the run summary."
+        )
+    return report
+
+
+def read_synthetic_flag(data_root: str | Path) -> bool:
+    """Whether the staged data in ``data_root`` are synthetic demo data.
+
+    Args:
+        data_root: Directory holding the staged files.
+
+    Returns:
+        bool: True if the staging report attests synthetic data, False if it
+        attests real post-DUA data.
+
+    Raises:
+        StagingError: If the provenance record is missing or unverifiable.
+    """
+    return bool(read_staging_report(data_root)["synthetic"])

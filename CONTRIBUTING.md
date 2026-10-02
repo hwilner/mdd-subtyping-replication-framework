@@ -10,7 +10,12 @@ changes land via pull request.
   (see `docs/DATA_ACCESS.md`). Never commit subject-level data, credentials,
   or derived features from the real dataset. Synthetic data only.
 - **Tests must pass.** `python -m pytest -q` must be green before merge.
-  CI runs pytest on Python 3.10–3.12.
+  CI (`.github/workflows/ci.yml`) runs pytest on Python 3.10–3.12, a
+  staged-demo smoke test, and `scripts/check_demo_reproducibility.py`.
+- **Committed demo numbers must reproduce.** If you change the default code
+  path, run `python scripts/check_demo_reproducibility.py --update` and update
+  the figures quoted in `docs/METHODS.md` in the same PR — otherwise CI fails
+  the drift check.
 - **Small, reviewable PRs.** One task issue per PR where possible; reference
   the issue (`Closes #N`) in the PR body.
 
@@ -37,6 +42,7 @@ when absent, the built-in empirical-Bayes ComBat in
 | `src/loso_replication/simulate.py` | Synthetic multi-site data with planted ground truth. |
 | `src/loso_replication/io.py` | REST-meta-MDD Phase II loaders (DUA-gated). |
 | `tests/` | Synthetic validation of the full pipeline. |
+| `scripts/check_demo_reproducibility.py` | Drift guard for the committed demo numbers. |
 | `docs/` | Introduction and data-access documentation. |
 
 ## Adding a published finding to the registry

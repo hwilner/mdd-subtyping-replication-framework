@@ -11,6 +11,8 @@ from loso_replication.loso import LosoReplicator
 from loso_replication.staging import (
     StagingError,
     load_staged_dataset,
+    read_synthetic_flag,
+    read_staging_report,
     stage_synthetic_demo,
     validate_staged,
 )
@@ -87,3 +89,58 @@ def test_staged_synthetic_runs_through_loso(tmp_path):
     # Planted replicable effects give clearly better-than-chance agreement
     # on synthetic data (chance is ~0.5; null features dilute the metric).
     assert result.mean_sign_consistency > 0.6
+
+
+def test_read_synthetic_flag_reads_the_staging_report(tmp_path):
+    """The provenance flag must come from the report describing the data.
+
+    Args:
+        tmp_path: tmp path.
+    """
+    stage_synthetic_demo(tmp_path, seed=5)
+    assert read_synthetic_flag(tmp_path) is True
+
+
+def test_read_synthetic_flag_reports_real_data(tmp_path):
+    """Real staged data must be attested as real, not guessed at.
+
+    Args:
+        tmp_path: tmp path.
+    """
+    stage_synthetic_demo(tmp_path, seed=5)
+    report = read_staging_report(tmp_path)
+    report["synthetic"] = False
+    (tmp_path / "STAGING_REPORT.json").write_text(json.dumps(report))
+    assert read_synthetic_flag(tmp_path) is False
+
+
+def test_read_synthetic_flag_requires_a_provenance_record(tmp_path):
+    """Unstaged data must error rather than default to a provenance label.
+
+    Args:
+        tmp_path: tmp path.
+    """
+    with pytest.raises(StagingError, match="Missing provenance record"):
+        read_synthetic_flag(tmp_path)
+
+
+def test_read_synthetic_flag_rejects_a_report_without_the_field(tmp_path):
+    """A report missing the provenance field must not be treated as real data.
+
+    Args:
+        tmp_path: tmp path.
+    """
+    (tmp_path / "STAGING_REPORT.json").write_text(json.dumps({"n_sites": 3}))
+    with pytest.raises(StagingError, match="refusing to record an unverified"):
+        read_synthetic_flag(tmp_path)
+
+
+def test_read_synthetic_flag_rejects_corrupt_json(tmp_path):
+    """A corrupt provenance record must raise, not fall back to a default.
+
+    Args:
+        tmp_path: tmp path.
+    """
+    (tmp_path / "STAGING_REPORT.json").write_text("{not json")
+    with pytest.raises(StagingError, match="Cannot read provenance record"):
+        read_synthetic_flag(tmp_path)
