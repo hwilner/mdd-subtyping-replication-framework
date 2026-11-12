@@ -50,15 +50,38 @@ def simulate_multisite(
 ) -> SyntheticDataset:
     """Simulate a multi-site case-control connectivity dataset.
 
-    Parameters
-    ----------
-    effect_size:
-        Cohen's d of planted replicable effects (and magnitude of planted
-        non-replicable effects before sign randomization).
-    batch_shift_scale:
-        SD of per-site additive batch offsets (units of feature SD).
-    batch_scale_scale:
-        SD of per-site multiplicative batch scaling around 1.0.
+    Args:
+        n_sites:
+            Number of sites (batches) to simulate.
+        n_per_site:
+            Subjects per site.
+        case_fraction:
+            Probability that a subject is a case (label 1).
+        n_features:
+            Total number of features in the matrix.
+        n_replicable:
+            Number of features carrying a replicable case-control effect
+            (same direction at every site).
+        n_nonreplicable:
+            Number of features carrying a non-replicable effect (random sign
+            per site).
+        effect_size:
+            Cohen's d of planted replicable effects (and magnitude of planted
+            non-replicable effects before sign randomization).
+        batch_shift_scale:
+            SD of per-site additive batch offsets (units of feature SD).
+        batch_scale_scale:
+            SD of per-site multiplicative batch scaling around 1.0.
+        seed:
+            Seed for the random number generator; identical seeds reproduce
+            identical datasets.
+
+    Returns:
+        SyntheticDataset: The simulated feature matrix, labels, site labels,
+        and ground-truth bookkeeping.
+
+    Raises:
+        ValueError: If the planted effects exceed the number of features.
     """
     rng = np.random.default_rng(seed)
     if n_replicable + n_nonreplicable > n_features:

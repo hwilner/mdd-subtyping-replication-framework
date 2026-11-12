@@ -11,8 +11,8 @@ It never writes inside the repository, so it is safe to run on a dirty tree
 (and in CI). Run it with ``--update`` to refresh the committed outputs after an
 intentional change to the default path.
 
-Usage
------
+Usage:
+
     python scripts/check_demo_reproducibility.py
     python scripts/check_demo_reproducibility.py --update
 """

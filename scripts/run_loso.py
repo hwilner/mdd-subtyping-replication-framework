@@ -7,8 +7,8 @@ replication benchmark, and writes per-fold and aggregate metrics to
 ``reports/loso/`` (small CSV/JSON, safe to commit for synthetic runs;
 real-data outputs must respect the DUA terms).
 
-Usage
------
+Usage:
+
     # Real staged data (post-DUA):
     python scripts/run_loso.py --data-root /path/to/rest-meta-mdd
 
@@ -39,10 +39,11 @@ from loso_replication.staging import (  # noqa: E402
 
 
 def main() -> int:
-    """Main.
+    """Run the LOSO benchmark on staged data and write the reports.
 
     Returns:
-        int: the result.
+        int: Exit code — 0 on success, 1 if the staged data cannot be
+        loaded or its provenance cannot be verified.
     """
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data-root", required=True)

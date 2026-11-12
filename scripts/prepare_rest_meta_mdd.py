@@ -15,8 +15,8 @@ This script checks the layout and file integrity and writes
 instead writes a small synthetic dataset in the same layout so the full
 prepare -> benchmark path can be exercised without the DUA data.
 
-Usage
------
+Usage:
+
     python scripts/prepare_rest_meta_mdd.py --data-root /path/to/rest-meta-mdd
     python scripts/prepare_rest_meta_mdd.py --data-root data/demo --synthetic
 """
@@ -39,10 +39,10 @@ from loso_replication.staging import (  # noqa: E402
 
 
 def main() -> int:
-    """Main.
+    """Validate staged REST-meta-MDD files, or stage a synthetic demo dataset.
 
     Returns:
-        int: the result.
+        int: Exit code — 0 on success, 1 if staging validation fails.
     """
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data-root", required=True,
