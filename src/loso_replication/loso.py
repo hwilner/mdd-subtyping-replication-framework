@@ -4,8 +4,8 @@ Given a multi-site feature matrix with case/control labels, the framework
 holds out one site at a time, estimates effect sizes on the training
 sites, and evaluates whether the effect replicates on the held-out site.
 
-Metrics
--------
+Metrics:
+
 - ``sign_consistency``: fraction of training-derived significant effects
   whose held-out effect has the same sign.
 - ``effect_map_correlation``: Pearson correlation between the training
@@ -155,26 +155,29 @@ class LosoResult:
 class LosoReplicator:
     """Leave-one-site-out replication of case-control effect maps.
 
-    Parameters
-    ----------
-    alpha:
-        Nominal p-value threshold for "significant" effects.
-    min_train_sites:
-        Minimum number of training sites required per fold. Sites that cannot
-        meet it are recorded in ``LosoResult.skipped_sites`` rather than
-        dropped without trace.
-    harmonize:
-        Optional callable ``(X, sites) -> X_harmonized`` applied before
-        splitting (e.g. :func:`loso_replication.combat.combat`).
+    Args:
+        alpha:
+            Nominal p-value threshold for "significant" effects.
+        min_train_sites:
+            Minimum number of training sites required per fold. Sites that
+            cannot meet it are recorded in ``LosoResult.skipped_sites``
+            rather than dropped without trace.
+        harmonize:
+            Optional callable ``(X, sites) -> X_harmonized`` applied before
+            splitting (e.g. :func:`loso_replication.combat.combat`).
     """
 
     def __init__(self, alpha: float = 0.05, min_train_sites: int = 2, harmonize=None):
-        """Initialize the instance.
+        """Initialize the replicator.
 
         Args:
-            alpha (float): alpha.
-            min_train_sites (int): min train sites.
-            harmonize: harmonize.
+            alpha: Nominal p-value threshold for calling a training effect
+                "significant".
+            min_train_sites: Minimum number of training sites required per
+                fold; folds that cannot meet it are skipped and recorded in
+                ``LosoResult.skipped_sites``.
+            harmonize: Optional callable ``(X, sites) -> X_harmonized``
+                applied to the full matrix before site splitting (e.g. ComBat).
         """
         self.alpha = alpha
         self.min_train_sites = min_train_sites
@@ -193,14 +196,13 @@ class LosoReplicator:
     def run(self, X: np.ndarray | pd.DataFrame, y: np.ndarray, sites: np.ndarray) -> LosoResult:
         """Run the full LOSO benchmark.
 
-        Parameters
-        ----------
-        X:
-            (n_samples, n_features) feature matrix.
-        y:
-            Binary labels, 1 = case (MDD), 0 = control.
-        sites:
-            Site label per sample.
+        Args:
+            X:
+                (n_samples, n_features) feature matrix.
+            y:
+                Binary labels, 1 = case (MDD), 0 = control.
+            sites:
+                Site label per sample.
 
         Returns:
             LosoResult: Per-fold metrics plus the sites that were skipped.

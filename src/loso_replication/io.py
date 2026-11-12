@@ -46,13 +46,21 @@ def load_features(
 ) -> pd.DataFrame:
     """Load a harmonization-ready feature matrix (subjects x features).
 
-    Parameters
-    ----------
-    data_root:
-    Local directory containing the REST-meta-MDD Phase II derivatives
-    (only available after DUA approval).
-    modality:
-    One of ``"FC"``, ``"ALFF"``, ``"ReHo"``.
+    Args:
+        data_root:
+            Local directory containing the REST-meta-MDD Phase II derivatives
+            (only available after DUA approval).
+        modality:
+            One of ``"FC"``, ``"ALFF"``, ``"ReHo"``.
+
+    Returns:
+        pd.DataFrame: The feature matrix, indexed by subject ID.
+
+    Raises:
+        ValueError: If ``modality`` is not one of ``"FC"``, ``"ALFF"``,
+            ``"ReHo"``.
+        DataAccessError: If no usable data root is configured or the expected
+            feature file is missing from it.
     """
     if modality not in {"FC", "ALFF", "ReHo"}:
         raise ValueError("modality must be one of 'FC', 'ALFF', 'ReHo'")
