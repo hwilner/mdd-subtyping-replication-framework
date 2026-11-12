@@ -157,24 +157,22 @@ def combat(
 ) -> np.ndarray | pd.DataFrame:
     """Harmonize a feature matrix across sites with ComBat.
 
-    Parameters
-    ----------
-    data:
-        (n_samples, n_features) matrix of connectivity/ALFF/ReHo features.
-    sites:
-        Length-n_samples site label per row.
-    ref_batch:
-        Optional site to hold out of the empirical-Bayes prior estimation (see
-        :func:`_builtin_combat`). Naming a reference site forces the built-in
-        backend, because the optional ``neuroCombat`` package is only used on
-        the unconstrained default path.
-    prefer_neurocombat:
-        Use the optional ``neuroCombat`` package when available; otherwise
-        fall back to the built-in empirical-Bayes implementation.
+    Args:
+        data:
+            (n_samples, n_features) matrix of connectivity/ALFF/ReHo features.
+        sites:
+            Length-n_samples site label per row.
+        ref_batch:
+            Optional site to hold out of the empirical-Bayes prior estimation
+            (see :func:`_builtin_combat`). Naming a reference site forces the
+            built-in backend, because the optional ``neuroCombat`` package is
+            only used on the unconstrained default path.
+        prefer_neurocombat:
+            Use the optional ``neuroCombat`` package when available; otherwise
+            fall back to the built-in empirical-Bayes implementation.
 
     Returns:
-    -------
-    Harmonized matrix, same type/shape as ``data``.
+        The harmonized matrix, same type/shape as ``data``.
     """
     is_df = isinstance(data, pd.DataFrame)
     arr = data.to_numpy(dtype=float) if is_df else np.asarray(data, dtype=float)
@@ -196,25 +194,44 @@ class CombatHarmonizer:
     """Small sklearn-style wrapper around :func:`combat`."""
 
     def __init__(self, prefer_neurocombat: bool = True):
-        """Initialize the instance.
+        """Initialize the harmonizer.
 
         Args:
-        prefer_neurocombat (bool): prefer neurocombat.
+            prefer_neurocombat: Prefer the optional ``neuroCombat`` backend
+                when it is installed; otherwise (or always, when False) use
+                the built-in empirical-Bayes implementation.
         """
         self.prefer_neurocombat = prefer_neurocombat
 
     def fit_transform(self, data, sites):
-        """Fit transform.
+        """Harmonize ``data`` across sites in a single step.
+
+        ComBat is transductive: the site effects are estimated from the same
+        matrix being corrected, so fitting and transforming cannot be
+        separated. This method simply forwards both arguments to
+        :func:`combat`.
 
         Args:
-        data: data.
-        sites: sites.
+            data: (n_samples, n_features) feature matrix to harmonize.
+            sites: Length-n_samples site label per row; defines the batches.
 
         Returns:
-        The transform.
+            The harmonized matrix, same type/shape as ``data``.
         """
         return combat(data, sites, prefer_neurocombat=self.prefer_neurocombat)
 
-    # ComBat requires batch labels for new data; kept for API symmetry.
-    def transform(self, data, sites):  # noqa: D102
+    def transform(self, data, sites):
+        """Harmonize data; kept for API symmetry with sklearn transformers.
+
+        ComBat requires the batch labels of the data being corrected, so this
+        alias of :meth:`fit_transform` takes ``sites`` explicitly rather than
+        relying on stored state.
+
+        Args:
+            data: (n_samples, n_features) feature matrix to harmonize.
+            sites: Length-n_samples site label per row; defines the batches.
+
+        Returns:
+            The harmonized matrix, same type/shape as ``data``.
+        """
         return self.fit_transform(data, sites)

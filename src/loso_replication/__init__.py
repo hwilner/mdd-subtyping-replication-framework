@@ -13,8 +13,8 @@ Quick start (synthetic data)::
     result = LosoReplicator().run(X_h, ds.y, ds.sites)
     print(result.summary())
 
-Module overview
----------------
+Module overview:
+
 - :mod:`loso_replication.combat` — empirical-Bayes ComBat harmonization.
 - :mod:`loso_replication.loso` — LOSO splitting, effect sizes, replication
   metrics (sign consistency, effect-map correlation, held-out significance).
