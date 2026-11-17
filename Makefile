@@ -1,7 +1,7 @@
 # One-command entry points. Real-data runs require the REST-meta-MDD
 # Phase II DUA and a local data root (never committed).
 
-.PHONY: install test stage-demo benchmark-demo benchmark check-repro
+.PHONY: install test stage-demo benchmark-demo benchmark check-repro folds-demo paper1-demo
 
 DATA_ROOT ?= data/demo
 
@@ -28,3 +28,14 @@ benchmark:
 # figures quoted in docs/METHODS.md cannot go stale unnoticed.
 check-repro:
 	python scripts/check_demo_reproducibility.py
+
+# Run every demo fold through the single-fold runner (issue #6), writing
+# checksummed per-fold outputs under reports/loso/folds/.
+folds-demo:
+	python scripts/run_fold.py --data-root $(DATA_ROOT) --synthetic --all
+
+# Regenerate the Paper 1 demo tables/figures from committed artifacts
+# (issue #7 rendering infrastructure; reads reports/loso/ only).
+paper1-demo:
+	python reports/paper1/make_tables.py
+	python reports/paper1/make_figures.py
