@@ -1,0 +1,45 @@
+{
+  "folds": [
+    {
+      "file": "fold_site_0.json",
+      "held_out_site": "site_0",
+      "sha256": "507c1e187fb6c039092fbf80f8da1e87253cf5479e047bd1607bcd1daa479f84",
+      "status": "completed"
+    },
+    {
+      "file": "fold_site_1.json",
+      "held_out_site": "site_1",
+      "sha256": "37cdab2d66d1d53311d535fbac5c13ca69b7c850301595264f9fb2beedeed81c",
+      "status": "completed"
+    },
+    {
+      "file": "fold_site_2.json",
+      "held_out_site": "site_2",
+      "sha256": "e1e97cf4a6484667930ea9da8a03290cf6107284b4a9ac87fd44b2a67973e03c",
+      "status": "completed"
+    },
+    {
+      "file": "fold_site_3.json",
+      "held_out_site": "site_3",
+      "sha256": "226f27f30f81230fbec585e48d2e94f4d18a37f1523c6fb733ff6f7f1f6a02b7",
+      "status": "completed"
+    },
+    {
+      "file": "fold_site_4.json",
+      "held_out_site": "site_4",
+      "sha256": "71bc76097faa5f7975dd37ddde94f5a9aea3c11b8110de2dbe32ceced7adffba",
+      "status": "completed"
+    },
+    {
+      "file": "fold_site_5.json",
+      "held_out_site": "site_5",
+      "sha256": "cc2f965dc6725923c53358024d43898ed6a02b20a32b118388168de6929f19d6",
+      "status": "completed"
+    }
+  ],
+  "modality": "FC",
+  "n_completed": 6,
+  "n_folds": 6,
+  "n_skipped": 0,
+  "schema": "loso-fold-manifest/v1"
+}

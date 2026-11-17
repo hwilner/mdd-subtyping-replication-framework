@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="440" viewBox="0 0 780 440" font-family="Helvetica, Arial, sans-serif">
+<title>Figure 2 (synthetic demo): LOSO replication metrics by held-out site</title>
+<desc>Figure 2 (synthetic demo). Leave-one-site-out replication metrics by held-out site: sign consistency, effect-map correlation, and held-out significance for the six synthetic demo sites. Source: reports/loso/loso_fold_metrics.csv (deterministic synthetic benchmark; not an MDD finding). The real-data version of this figure is planned under issue #14 after real fold execution (issue #9).</desc>
+<rect width="780" height="440" fill="white"/>
+<line x1="64" y1="364.00" x2="760" y2="364.00" stroke="#888888" stroke-width="1"/>
+<text x="56" y="368.00" text-anchor="end" font-size="11" fill="#444444">0.0</text>
+<line x1="64" y1="302.40" x2="760" y2="302.40" stroke="#dddddd" stroke-width="1"/>
+<text x="56" y="306.40" text-anchor="end" font-size="11" fill="#444444">0.2</text>
+<line x1="64" y1="240.80" x2="760" y2="240.80" stroke="#dddddd" stroke-width="1"/>
+<text x="56" y="244.80" text-anchor="end" font-size="11" fill="#444444">0.4</text>
+<line x1="64" y1="179.20" x2="760" y2="179.20" stroke="#dddddd" stroke-width="1"/>
+<text x="56" y="183.20" text-anchor="end" font-size="11" fill="#444444">0.6</text>
+<line x1="64" y1="117.60" x2="760" y2="117.60" stroke="#dddddd" stroke-width="1"/>
+<text x="56" y="121.60" text-anchor="end" font-size="11" fill="#444444">0.8</text>
+<line x1="64" y1="56.00" x2="760" y2="56.00" stroke="#dddddd" stroke-width="1"/>
+<text x="56" y="60.00" text-anchor="end" font-size="11" fill="#444444">1.0</text>
+<rect x="78.50" y="158.67" width="29.00" height="205.33" fill="#4c78a8"/>
+<rect x="107.50" y="188.46" width="29.00" height="175.54" fill="#f58518"/>
+<rect x="136.50" y="85.33" width="29.00" height="278.67" fill="#54a24b"/>
+<text x="122.00" y="382" text-anchor="middle" font-size="12" fill="#222222">site_0</text>
+<rect x="194.50" y="133.00" width="29.00" height="231.00" fill="#4c78a8"/>
+<rect x="223.50" y="188.95" width="29.00" height="175.05" fill="#f58518"/>
+<rect x="252.50" y="113.75" width="29.00" height="250.25" fill="#54a24b"/>
+<text x="238.00" y="382" text-anchor="middle" font-size="12" fill="#222222">site_1</text>
+<rect x="310.50" y="141.56" width="29.00" height="222.44" fill="#4c78a8"/>
+<rect x="339.50" y="180.12" width="29.00" height="183.88" fill="#f58518"/>
+<rect x="368.50" y="73.11" width="29.00" height="290.89" fill="#54a24b"/>
+<text x="354.00" y="382" text-anchor="middle" font-size="12" fill="#222222">site_2</text>
+<rect x="426.50" y="107.33" width="29.00" height="256.67" fill="#4c78a8"/>
+<rect x="455.50" y="168.91" width="29.00" height="195.09" fill="#f58518"/>
+<rect x="484.50" y="73.11" width="29.00" height="290.89" fill="#54a24b"/>
+<text x="470.00" y="382" text-anchor="middle" font-size="12" fill="#222222">site_3</text>
+<rect x="542.50" y="110.35" width="29.00" height="253.65" fill="#4c78a8"/>
+<rect x="571.50" y="167.09" width="29.00" height="196.91" fill="#f58518"/>
+<rect x="600.50" y="110.35" width="29.00" height="253.65" fill="#4c78a8"/>
+<text x="586.00" y="382" text-anchor="middle" font-size="12" fill="#222222">site_4</text>
+<rect x="658.50" y="128.47" width="29.00" height="235.53" fill="#4c78a8"/>
+<rect x="687.50" y="210.24" width="29.00" height="153.76" fill="#f58518"/>
+<rect x="716.50" y="74.12" width="29.00" height="289.88" fill="#54a24b"/>
+<text x="702.00" y="382" text-anchor="middle" font-size="12" fill="#222222">site_5</text>
+<text x="412.00" y="426" text-anchor="middle" font-size="13" fill="#222222">Held-out site</text>
+<text x="16" y="210.00" text-anchor="middle" font-size="13" fill="#222222" transform="rotate(-90 16 210.00)">Metric value</text>
+<text x="412.00" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="#111111">Figure 2 (synthetic demo): LOSO replication metrics by held-out site</text>
+<rect x="570" y="30" width="12" height="12" fill="#4c78a8"/>
+<text x="588" y="40" font-size="11" fill="#222222">Sign consistency</text>
+<rect x="570" y="48" width="12" height="12" fill="#f58518"/>
+<text x="588" y="58" font-size="11" fill="#222222">Effect-map correlation</text>
+<rect x="570" y="66" width="12" height="12" fill="#54a24b"/>
+<text x="588" y="76" font-size="11" fill="#222222">Held-out significance</text>
+</svg>

@@ -1,0 +1,23 @@
+{
+  "alpha": 0.05,
+  "effect_map_correlation": 0.597008886422224,
+  "harmonization": "combat (built-in empirical Bayes)",
+  "held_out_site": "site_2",
+  "heldout_significance": 0.9444444444444444,
+  "modality": "FC",
+  "n_cases_test": 14,
+  "n_controls_test": 26,
+  "n_test": 40,
+  "n_train": 200,
+  "n_train_significant_effects": 18,
+  "provenance": {
+    "data_root": "data/demo",
+    "source": "STAGING_REPORT.json",
+    "synthetic": true
+  },
+  "schema": "loso-fold-result/v1",
+  "sign_consistency": 0.7222222222222222,
+  "skip_reason": null,
+  "status": "completed",
+  "undefined_reason": null
+}
