@@ -25,7 +25,7 @@ The scientific motivation and newcomer-facing background are documented in [docs
 | #3 | LOSO replication benchmark on real data | Umbrella | #1, #5 | Open |
 | #4 | Results writeup and framework release | Umbrella | #3 | Open |
 | #5 | Cross-site harmonization with ComBat + QC | Umbrella | #2 | Open |
-| #6 | Build LOSO benchmark runner and fold configuration | Atomic | #5; uses framework from #1 | Open |
+| #6 | Build LOSO benchmark runner and fold configuration | Atomic | #5; uses framework from #1 | Closed |
 | #7 | Paper 1 figure and table scripts | Atomic | #3 | Open |
 | #8 | Implement ComBat harmonization for FC/ALFF/ReHo | Atomic | #2 | Open |
 | #9 | Execute all site-holdout folds and collect results | Atomic | #6 | Open |
@@ -62,6 +62,9 @@ The synthetic run covers 240 subjects, 60 FC features, and 6 sites, with 0 skipp
 | `src/loso_replication/staging.py` | Post-DUA staging, integrity checks, `(X, y, sites)` conversion, and synthetic demo mode. |
 | `scripts/prepare_rest_meta_mdd.py` | One-command staging/validation (`--synthetic` for the demo layout). |
 | `scripts/run_loso.py` | One-command LOSO benchmark runner writing `reports/loso/`. |
+| `src/benchmark/` | Config-driven single-fold runner: fold configuration, checksummed per-fold outputs, manifest verification (issue #6). |
+| `scripts/run_fold.py` | One-command single-fold runner (`--fold SITE` or `--all`); same pipeline contract as `run_loso.py`. |
+| `reports/paper1/` | Paper 1 table/figure rendering scripts plus committed demo outputs; regenerate with `make paper1-demo` (issue #7 infrastructure). |
 | `scripts/check_demo_reproducibility.py` | Fails if the committed demo benchmark numbers no longer reproduce. |
 | `Makefile` | `make benchmark-demo`, `make benchmark DATA_ROOT=...`, and `make check-repro`. |
 | `.github/workflows/ci.yml` | Python 3.10-3.12 tests plus staged-demo and reproducibility checks. |
@@ -88,6 +91,14 @@ Confirm the committed demo numbers still reproduce:
 
 ```bash
 make check-repro
+```
+
+Single-fold execution and Paper 1 rendering (both run from the committed
+synthetic artifacts):
+
+```bash
+make folds-demo    # checksummed per-fold outputs under reports/loso/folds/
+make paper1-demo   # regenerate Tables 1-3 and Figure 2 (demo) under reports/paper1/
 ```
 
 Real-data pipeline (after DUA approval, see [docs/DATA_ACCESS.md](docs/DATA_ACCESS.md)):

@@ -31,6 +31,13 @@ This document is the paper-style results record for the MDD subtyping-with-repli
 | site_4 | 200 | 40 | 0.824 | 0.639 | 0.824 |
 | site_5 | 200 | 40 | 0.765 | 0.499 | 0.941 |
 
+Each fold of the demo benchmark is also committed as a standalone,
+checksummed record under `reports/loso/folds/FC/` (with
+`reports/loso/fold_config.json` enumerating the folds), produced by the
+single-fold runner of issue #6 (`scripts/run_fold.py`); every per-fold
+record reproduces the corresponding Table 2 row exactly, and the set
+verifies against `reports/loso/folds/FC/manifest.json`.
+
 **Table 3. Aggregate synthetic LOSO benchmark results.** Means are over the six folds for which each metric is defined. These values are deterministic for the committed synthetic seed and are protected from silent drift by `make check-repro`.
 
 | Metric | Mean | Defined folds | Interpretation |
@@ -68,7 +75,7 @@ This document is the paper-style results record for the MDD subtyping-with-repli
 
 **Figure 1. Replication-framework concept schematic.** Multi-site resting-state features are harmonized with ComBat; each LOSO fold discovers effects on N-1 sites and tests them on the hidden site; replication is scored by sign consistency, effect-map correlation, and held-out significance. Source and caption: `docs/figures/concept_figure.md`; rendered asset: `docs/figures/01-concept-schematic.png`.
 
-**Figure 2. Distribution of LOSO replication metrics across held-out sites.** Planned real-data figure; authorized by #14 after fold execution (#9). The synthetic fold metrics in Table 2 provide the plotting contract.
+**Figure 2. Distribution of LOSO replication metrics across held-out sites.** Planned real-data figure; authorized by #14 after fold execution (#9). The plotting contract is locked by a demo rendering from the committed synthetic fold metrics (Table 2): `reports/paper1/make_figures.py` regenerates `reports/paper1/fig2_loso_metrics_by_site_demo.svg` (caption in `reports/paper1/fig2_caption.md`) byte-identically, guarded by `tests/test_paper1_rendering.py`. The real-data version of this figure remains planned under #14.
 
 **Figure 3. Pre- versus post-ComBat site-effect diagnostics.** Planned real-data figure; authorized by #10 after harmonization (#8) and QC (#13).
 
@@ -82,5 +89,9 @@ This document is the paper-style results record for the MDD subtyping-with-repli
 | `main` | b2d9e23 | `make check-repro` | Pass | 8 committed summary keys reproduced exactly |
 | `chore/daily-2026-10-02-mdd-subtyping-replication-framework` | 855eb42 | `PYTHONPATH=$PWD:$PWD/src python -m pytest -q` | 40/40 pass (13.90 s) | Same code/tests as main; branch lacks the root verification note |
 | `chore/daily-2026-10-02-mdd-subtyping-replication-framework` | 855eb42 | `make check-repro` | Pass | 8 committed summary keys reproduced exactly |
+| `main` | 30a010b, aaf05cf | `PYTHONPATH=$PWD:$PWD/src python -m pytest -q` | 58/58 pass (14.66 s) | Python 3.12, CPU; adds benchmark-runner and paper1-rendering tests |
+| `main` | 30a010b, aaf05cf | `make check-repro` | Pass | 8 committed summary keys reproduced exactly |
+| `main` | aaf05cf | `benchmark.verify_manifest("reports/loso")` | 0 problems | All 6 committed demo fold records checksum-verified |
+| `main` | 8d309f4 | blob-SHA check of all 23 pushed files | 23/23 match | One SVG transcription error caught and fixed in 8d309f4 |
 
 The older verification note remains at `results.md`; this file is the paper-style results record used by the README going forward.
