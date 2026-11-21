@@ -1,0 +1,65 @@
+{
+  "harmonization": "combat (built-in empirical Bayes)",
+  "n_subjects": 240,
+  "n_features": 60,
+  "n_sites": 6,
+  "pre": {
+    "eta_squared_mean": 0.184539103081614,
+    "eta_squared_median": 0.1656856679165733,
+    "eta_squared_max": 0.41862808647903577,
+    "site_classification": {
+      "accuracy": 0.9916666666666668,
+      "per_fold": [
+        0.9583333333333334,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "chance_majority": 0.16666666666666666,
+      "n_sites": 6,
+      "model": "StandardScaler + multinomial LogisticRegression(max_iter=1000)",
+      "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=0)"
+    },
+    "site_mean_spread": {
+      "mean": 0.5633689459162298,
+      "median": 0.5445631173073087,
+      "max": 1.1652662177220723
+    }
+  },
+  "post": {
+    "eta_squared_mean": 0.0033699601906792744,
+    "eta_squared_median": 0.002163759763193071,
+    "eta_squared_max": 0.009973900407919118,
+    "site_classification": {
+      "accuracy": 0.016666666666666666,
+      "per_fold": [
+        0.041666666666666664,
+        0.020833333333333332,
+        0.0,
+        0.0,
+        0.020833333333333332
+      ],
+      "chance_majority": 0.16666666666666666,
+      "n_sites": 6,
+      "model": "StandardScaler + multinomial LogisticRegression(max_iter=1000)",
+      "cv": "StratifiedKFold(n_splits=5, shuffle=True, random_state=0)"
+    },
+    "site_mean_spread": {
+      "mean": 0.06783404253051112,
+      "median": 0.05567801616658389,
+      "max": 0.1620709229510356
+    }
+  },
+  "biological_preservation": {
+    "effect_map_correlation": 0.9900230505733189,
+    "mean_abs_d_pre": 0.39658028578625754,
+    "mean_abs_d_post": 0.41612976083582753,
+    "sign_flips": 7,
+    "n_features": 60
+  },
+  "data_root": "data/demo",
+  "modality": "FC",
+  "synthetic": true,
+  "seed": 0
+}
