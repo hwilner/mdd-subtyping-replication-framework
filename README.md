@@ -62,6 +62,8 @@ The synthetic run covers 240 subjects, 60 FC features, and 6 sites, with 0 skipp
 | `src/loso_replication/staging.py` | Post-DUA staging, integrity checks, `(X, y, sites)` conversion, and synthetic demo mode. |
 | `scripts/prepare_rest_meta_mdd.py` | One-command staging/validation (`--synthetic` for the demo layout). |
 | `scripts/run_loso.py` | One-command LOSO benchmark runner writing `reports/loso/`. |
+| `src/loso_replication/diagnostics.py` | Pre/post-ComBat batch-effect diagnostics: site variance decomposition, site-classification accuracy, site-mean spread, biological-signal preservation (issue #10). |
+| `scripts/run_diagnostics.py` | One-command diagnostics report writing `reports/diagnostics/` (JSON + captioned Markdown); `make diagnostics-demo` regenerates the committed demo outputs. |
 | `src/benchmark/` | Config-driven single-fold runner: fold configuration, checksummed per-fold outputs, manifest verification (issue #6). |
 | `scripts/run_fold.py` | One-command single-fold runner (`--fold SITE` or `--all`); same pipeline contract as `run_loso.py`. |
 | `reports/paper1/` | Paper 1 table/figure rendering scripts plus committed demo outputs; regenerate with `make paper1-demo` (issue #7 infrastructure). |

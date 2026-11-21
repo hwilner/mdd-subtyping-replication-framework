@@ -46,6 +46,28 @@ verifies against `reports/loso/folds/FC/manifest.json`.
 | Effect-map correlation | 0.585 | 6/6 | Pearson correlation between train and held-out Cohen's d maps |
 | Held-out significance | 0.895 | 6/6 | Fraction of training-significant effects that are nominally significant at the held-out site |
 
+### Batch-effect diagnostics demonstration (issue #10 machinery)
+
+The pre/post-harmonization diagnostics of `src/loso_replication/diagnostics.py` were run on the same staged synthetic demo dataset (`make diagnostics-demo`); the machine-readable report is `reports/diagnostics/batch_effect_diagnostics_FC.json` and the rendered version is `reports/diagnostics/batch_effect_diagnostics_FC.md`. These numbers validate the diagnostics machinery on planted batch shifts — they are a synthetic demonstration, not an MDD finding. The real-data diagnostics remain planned under Table 5 (awaiting #2, #8).
+
+**Table 3a. Synthetic site-signal diagnostics before vs. after ComBat.** Site eta^2 is the per-feature fraction of variance explained by site; site classification is the 5-fold cross-validated accuracy of a multinomial logistic regression predicting site from the features (chance = majority site fraction = 0.167); site-mean spread is the standard deviation of per-site feature means. All values are copied from the committed JSON report.
+
+| Diagnostic | Pre-ComBat | Post-ComBat |
+|---|---:|---:|
+| Site eta^2 (mean over features) | 0.1845 | 0.0034 |
+| Site eta^2 (max over features) | 0.4186 | 0.0100 |
+| Site classification accuracy | 0.9917 | 0.0167 |
+| Site-mean spread (mean over features) | 0.5634 | 0.0678 |
+
+**Table 3b. Synthetic biological-signal preservation.** The case-control Cohen's d effect map before vs. after harmonization; the high correlation shows ComBat removed the planted batch signal without removing the planted biological signal.
+
+| Quantity | Value |
+|---|---:|
+| Effect-map correlation (pre vs. post) | 0.9900 |
+| Mean |d| pre-ComBat | 0.3966 |
+| Mean |d| post-ComBat | 0.4161 |
+| Sign flips among meaningful effects (|d| > 0.2) | 0 / 21 |
+
 ## Pre-registered real-data result shells
 
 **Table 4. Replication of published MDD connectivity findings on REST-meta-MDD Phase II.** Planned primary output of the real-data benchmark; population is blocked on #2, fold execution on #3/#6/#9, and table/figure rendering on #14. No real-data analysis has been run.
@@ -93,5 +115,7 @@ verifies against `reports/loso/folds/FC/manifest.json`.
 | `main` | 30a010b, aaf05cf | `make check-repro` | Pass | 8 committed summary keys reproduced exactly |
 | `main` | aaf05cf | `benchmark.verify_manifest("reports/loso")` | 0 problems | All 6 committed demo fold records checksum-verified |
 | `main` | 8d309f4 | blob-SHA check of all 23 pushed files | 23/23 match | One SVG transcription error caught and fixed in 8d309f4 |
+| `main` | b3d7075, 9d8ee60 | `python -m pytest -q` | 69/69 pass (17.11 s) | Python 3.12, CPU; adds 11 batch-diagnostics tests (issue #10 machinery) |
+| `main` | b3d7075, 9d8ee60 | `make check-repro`; `make diagnostics-demo` re-run | Pass; byte-identical | 8 committed summary keys reproduced exactly; diagnostics outputs deterministic on re-run |
 
 The older verification note remains at `results.md`; this file is the paper-style results record used by the README going forward.

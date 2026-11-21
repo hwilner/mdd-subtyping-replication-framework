@@ -11,8 +11,9 @@ Audience: new contributors, including those new to data science. This document s
 | Registry of published findings | `src/loso_replication/findings.py` | 8 published MDD connectivity findings as structured effect specs (feature, expected direction, citation, DOI) |
 | Staging scripts | `src/loso_replication/staging.py`, `scripts/prepare_rest_meta_mdd.py` | Expected file layout, integrity checks, conversion to `(X, y, sites)`, synthetic demo mode |
 | One-command benchmark | `scripts/run_loso.py`, `Makefile` | `make benchmark` (real, post-DUA) and `make benchmark-demo` (synthetic) |
+| Batch-effect diagnostics | `src/loso_replication/diagnostics.py`, `scripts/run_diagnostics.py` | Pre/post-ComBat site eta^2 (per-feature variance decomposition), cross-validated site-classification accuracy, between-site mean spread, and case-control effect-map preservation; demo outputs under `reports/diagnostics/` (issue #10 machinery, real-data run pending #8/#2) |
 | Synthetic demo | `src/loso_replication/simulate.py`, `reports/loso/` | 6 sites × 240 subjects, planted effects + planted site shifts; demo run: mean sign consistency 0.760, effect-map correlation 0.585, held-out significance 0.895 |
-| Tests | `tests/` | 40 green tests (verified on Python 3.11; CI also runs 3.10-3.12): ComBat removes planted site effects while preserving biology; LOSO recovers planted replicable effects and flags non-replicable ones; staging roundtrip |
+| Tests | `tests/` | 69 green tests (verified on Python 3.12; CI also runs 3.10-3.12): ComBat removes planted site effects while preserving biology; LOSO recovers planted replicable effects and flags non-replicable ones; staging roundtrip; diagnostics detect planted batch shifts pre-ComBat, their removal post-ComBat, and effect-map preservation |
 
 ## Intended (blocked on data access)
 
