@@ -57,13 +57,16 @@ The synthetic run covers 240 subjects, 60 FC features, and 6 sites, with 0 skipp
 | `src/loso_replication/combat.py` | Empirical-Bayes ComBat harmonization (optional `neuroCombat` backend with built-in fallback). |
 | `src/loso_replication/loso.py` | LOSO framework: site splitting, train/test API, and replication metrics. |
 | `src/loso_replication/findings.py` | Registry of eight published MDD connectivity findings as structured effect specs. |
-| `src/loso_replication/simulate.py` | Synthetic multi-site data with planted case-control effects and site batch shifts. |
+| `src/loso_replication/simulate.py` | Synthetic multi-site data with planted case-control effects, site batch shifts, and optional planted motion outliers. |
 | `src/loso_replication/io.py` | REST-meta-MDD Phase II loaders; raise clear DUA-required errors until access is approved. |
 | `src/loso_replication/staging.py` | Post-DUA staging, integrity checks, `(X, y, sites)` conversion, and synthetic demo mode. |
 | `scripts/prepare_rest_meta_mdd.py` | One-command staging/validation (`--synthetic` for the demo layout). |
 | `scripts/run_loso.py` | One-command LOSO benchmark runner writing `reports/loso/`. |
 | `src/loso_replication/diagnostics.py` | Pre/post-ComBat batch-effect diagnostics: site variance decomposition, site-classification accuracy, site-mean spread, biological-signal preservation (issue #10). |
 | `scripts/run_diagnostics.py` | One-command diagnostics report writing `reports/diagnostics/` (JSON + captioned Markdown); `make diagnostics-demo` regenerates the committed demo outputs. |
+| `src/loso_replication/qc.py` | Motion/preprocessing input QC: per-site motion-outlier and exclusion counts, per-site feature-distribution summaries, deterministic SVG rendering (issue #13). |
+| `scripts/run_qc_report.py` | One-command input-QC report writing `reports/qc/` (JSON + captioned Markdown + SVG); `make qc-demo` regenerates the committed demo outputs. |
+| `reports/qc/` | Committed synthetic-demo input-QC outputs (planted motion outliers); real-data QC outputs are DUA-restricted. |
 | `src/benchmark/` | Config-driven single-fold runner: fold configuration, checksummed per-fold outputs, manifest verification (issue #6). |
 | `scripts/run_fold.py` | One-command single-fold runner (`--fold SITE` or `--all`); same pipeline contract as `run_loso.py`. |
 | `reports/paper1/` | Paper 1 table/figure rendering scripts plus committed demo outputs; regenerate with `make paper1-demo` (issue #7 infrastructure). |
@@ -72,7 +75,7 @@ The synthetic run covers 240 subjects, 60 FC features, and 6 sites, with 0 skipp
 | `.github/workflows/ci.yml` | Python 3.10-3.12 tests plus staged-demo and reproducibility checks. |
 | `reports/loso/` | Committed synthetic-demo benchmark outputs; real-data outputs are DUA-restricted. |
 | `tests/` | Synthetic tests for harmonization, LOSO, staging, script provenance, and demo reproducibility. |
-| `docs/` | Introduction, extended introduction, methods, data access, results, and figure documentation. |
+| `docs/` | Introduction, extended introduction, methods, data access, results, Paper 2 handoff notes, and figure documentation. |
 
 ## Use and validation
 
@@ -119,6 +122,7 @@ depression, REST-meta-MDD, subtyping, normative modeling, replication, neuroimag
 - [Extended introduction](docs/EXTENDED_INTRODUCTION.md)
 - [Materials and methods](docs/METHODS.md)
 - [Results](docs/RESULTS.md)
+- [Paper 2 handoff notes](docs/PAPER2_HANDOFF.md)
 - [REST-meta-MDD Phase II data access](docs/DATA_ACCESS.md)
 - [API overview](src/loso_replication/README.md)
 - [Contributing](CONTRIBUTING.md)
