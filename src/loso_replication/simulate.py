@@ -20,7 +20,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-__all__ = ["SyntheticDataset", "simulate_multisite"]
+__all__ = ["SyntheticDataset", "simulate_multisite", "simulate_motion"]
 
 
 @dataclass
@@ -130,3 +130,65 @@ def simulate_multisite(
         null_features=null,
         batch_shifts=batch_shifts,
     )
+
+
+def simulate_motion(
+    sites: np.ndarray,
+    seed: int = 0,
+    base_mean_mm: float = 0.10,
+    site_shift_mm: float = 0.04,
+    subject_noise_mm: float = 0.02,
+    max_outliers_per_site: int = 2,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Simulate mean framewise displacement with planted motion outliers.
+
+    Produces a deterministic ``mean_fd`` column (mm) for the synthetic demo
+    so the issue-#13 QC machinery can be exercised end to end without DUA
+    data. Baseline values are bounded in
+    ``[base_mean_mm - site_shift_mm - subject_noise_mm,
+      base_mean_mm + site_shift_mm + subject_noise_mm]``
+    (default max 0.16 mm), so with the default 0.2 mm exclusion threshold
+    every detected outlier is a planted one — the ground truth is exact by
+    construction, for any seed.
+
+    Args:
+        sites: Site label per subject (used only for grouping; values may
+            be strings or ints).
+        seed: Seed for the random number generator; identical seeds
+            reproduce identical columns.
+        base_mean_mm: Cohort-average mean framewise displacement.
+        site_shift_mm: Per-site scanner shift amplitude (uniform).
+        subject_noise_mm: Within-site subject jitter amplitude (uniform).
+        max_outliers_per_site: Site ``i`` (in sorted order) gets
+            ``i % (max_outliers_per_site + 1)`` planted outliers, so the
+            per-site outlier counts vary (0, 1, 2, 0, ...) and sites with
+            zero planted outliers are also exercised.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: The ``mean_fd`` values (mm) and a
+        boolean mask marking the planted outliers (ground truth).
+    """
+    rng = np.random.default_rng(seed)
+    sites = np.asarray(sites)
+    unique = sorted(set(sites), key=str)
+    n = len(sites)
+    shift = {
+        s: rng.uniform(-site_shift_mm, site_shift_mm) for s in unique
+    }
+    fd = np.array(
+        [
+            base_mean_mm + shift[s] + rng.uniform(-subject_noise_mm, subject_noise_mm)
+            for s in sites
+        ]
+    )
+    fd = np.clip(fd, 0.01, None)
+    planted = np.zeros(n, dtype=bool)
+    for i, s in enumerate(unique):
+        n_out = i % (max_outliers_per_site + 1)
+        if n_out == 0:
+            continue
+        idx = np.flatnonzero(sites == s)[:n_out]
+        # Planted outliers sit clearly above any reasonable threshold.
+        fd[idx] = 0.30 + 0.05 * rng.uniform(0.0, 1.0, size=n_out)
+        planted[idx] = True
+    return fd, planted
