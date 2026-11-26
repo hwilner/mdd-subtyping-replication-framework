@@ -1,0 +1,175 @@
+{
+  "motion": {
+    "available": true,
+    "column": "mean_fd",
+    "threshold_mm": 0.2,
+    "per_site": {
+      "site_0": {
+        "n_subjects": 40,
+        "n_motion_outliers": 0,
+        "outlier_subjects": [],
+        "max_fd_mm": 0.1308453324172848
+      },
+      "site_1": {
+        "n_subjects": 40,
+        "n_motion_outliers": 1,
+        "outlier_subjects": [
+          "sub0040"
+        ],
+        "max_fd_mm": 0.332756053199569
+      },
+      "site_2": {
+        "n_subjects": 40,
+        "n_motion_outliers": 2,
+        "outlier_subjects": [
+          "sub0080",
+          "sub0081"
+        ],
+        "max_fd_mm": 0.3456845381353694
+      },
+      "site_3": {
+        "n_subjects": 40,
+        "n_motion_outliers": 0,
+        "outlier_subjects": [],
+        "max_fd_mm": 0.0803807037197241
+      },
+      "site_4": {
+        "n_subjects": 40,
+        "n_motion_outliers": 1,
+        "outlier_subjects": [
+          "sub0160"
+        ],
+        "max_fd_mm": 0.34174941019792
+      },
+      "site_5": {
+        "n_subjects": 40,
+        "n_motion_outliers": 2,
+        "outlier_subjects": [
+          "sub0200",
+          "sub0201"
+        ],
+        "max_fd_mm": 0.3190907389983119
+      }
+    },
+    "total_outliers": 6
+  },
+  "exclusions": {
+    "motion_criterion": "mean_fd > 0.2 mm",
+    "data_criterion": "any non-finite feature value",
+    "per_site": {
+      "site_0": {
+        "n_total": 40,
+        "n_motion_excluded": 0,
+        "n_data_excluded": 0,
+        "n_excluded": 0,
+        "n_retained": 40
+      },
+      "site_1": {
+        "n_total": 40,
+        "n_motion_excluded": 1,
+        "n_data_excluded": 0,
+        "n_excluded": 1,
+        "n_retained": 39
+      },
+      "site_2": {
+        "n_total": 40,
+        "n_motion_excluded": 2,
+        "n_data_excluded": 0,
+        "n_excluded": 2,
+        "n_retained": 38
+      },
+      "site_3": {
+        "n_total": 40,
+        "n_motion_excluded": 0,
+        "n_data_excluded": 0,
+        "n_excluded": 0,
+        "n_retained": 40
+      },
+      "site_4": {
+        "n_total": 40,
+        "n_motion_excluded": 1,
+        "n_data_excluded": 0,
+        "n_excluded": 1,
+        "n_retained": 39
+      },
+      "site_5": {
+        "n_total": 40,
+        "n_motion_excluded": 2,
+        "n_data_excluded": 0,
+        "n_excluded": 2,
+        "n_retained": 38
+      }
+    },
+    "n_total": 240,
+    "n_excluded": 6,
+    "n_retained": 234
+  },
+  "feature_distributions": {
+    "per_site": {
+      "site_0": {
+        "n_values": 2400,
+        "mean": 0.08258507132171923,
+        "sd": 1.3287137132034528,
+        "min": -4.328136788323533,
+        "q1": -0.7855753080919389,
+        "median": 0.0836285182460782,
+        "q3": 0.9653715935904044,
+        "max": 4.801092206932719
+      },
+      "site_1": {
+        "n_values": 2400,
+        "mean": 0.027659779429401437,
+        "sd": 1.3006726416522563,
+        "min": -4.233632697316545,
+        "q1": -0.8609084812663597,
+        "median": 0.0315136938112942,
+        "q3": 0.8858822003723658,
+        "max": 4.924756189278663
+      },
+      "site_2": {
+        "n_values": 2400,
+        "mean": -0.22545519821119342,
+        "sd": 1.2711559929299054,
+        "min": -5.814606603097607,
+        "q1": -1.0448793814208832,
+        "median": -0.16737272155994445,
+        "q3": 0.5861408799988146,
+        "max": 4.547808280271769
+      },
+      "site_3": {
+        "n_values": 2400,
+        "mean": -0.052093030514946397,
+        "sd": 1.3002550171960772,
+        "min": -5.22722826601701,
+        "q1": -0.9025467319568528,
+        "median": -0.0818145106868471,
+        "q3": 0.8056884685111102,
+        "max": 4.836293876651848
+      },
+      "site_4": {
+        "n_values": 2400,
+        "mean": -0.07208948547246177,
+        "sd": 1.251462032202387,
+        "min": -5.2558649612680215,
+        "q1": -0.882354889699856,
+        "median": -0.0451247905108476,
+        "q3": 0.7612490404970662,
+        "max": 3.8962779346329968
+      },
+      "site_5": {
+        "n_values": 2400,
+        "mean": 0.11549865542479383,
+        "sd": 1.2386316946702018,
+        "min": -4.585662819910437,
+        "q1": -0.6930794091495638,
+        "median": 0.1408848974940775,
+        "q3": 0.9472176419551975,
+        "max": 4.80730799996051
+      }
+    }
+  },
+  "data_root": "data/demo",
+  "modality": "FC",
+  "synthetic": true,
+  "seed": 0
+}
