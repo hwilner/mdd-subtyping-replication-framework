@@ -68,6 +68,33 @@ The pre/post-harmonization diagnostics of `src/loso_replication/diagnostics.py` 
 | Mean |d| post-ComBat | 0.4161 |
 | Sign flips among meaningful effects (|d| > 0.2) | 0 / 21 |
 
+### Motion and preprocessing QC demonstration (issue #13 machinery)
+
+The input-QC machinery of `src/loso_replication/qc.py` was run on a synthetic demo dataset staged with a planted `mean_fd` column (`make qc-demo`; staging opt-in `with_motion=True`, so the default demo dataset is unchanged). The machine-readable report is `reports/qc/qc_report_FC.json`, the rendered version `reports/qc/qc_report_FC.md`, and the per-site distribution figure `reports/qc/qc_feature_distributions_FC.svg` (deterministic SVG, regenerates byte-identically). These numbers validate the QC machinery on planted motion outliers — they are a synthetic demonstration, not an MDD finding. The real-data QC report remains planned under Table 5 (awaiting #2, #8); on real inputs without a motion column the machinery reports motion QC as unavailable rather than estimating it.
+
+**Table 3c. Synthetic motion outliers and exclusion counts per site.** A subject is excluded when its mean framewise displacement exceeds 0.2 mm (declared default threshold; the pre-registered real-data value may differ) or its feature row contains a non-finite value. The six detected outliers are exactly the six planted ones (0/1/2 pattern across sites; recovery is exact by construction for any staging seed and is pinned by test). All values are copied from the committed JSON report.
+
+| Site | N | Motion outliers | Data exclusions | Excluded | Retained |
+|---|---:|---:|---:|---:|---:|
+| site_0 | 40 | 0 | 0 | 0 | 40 |
+| site_1 | 40 | 1 | 0 | 1 | 39 |
+| site_2 | 40 | 2 | 0 | 2 | 38 |
+| site_3 | 40 | 0 | 0 | 0 | 40 |
+| site_4 | 40 | 1 | 0 | 1 | 39 |
+| site_5 | 40 | 2 | 0 | 2 | 38 |
+| **Total** | **240** | **6** | **0** | **6** | **234** |
+
+**Table 3d. Synthetic per-site pooled feature-value distribution.** Mean and SD of all feature values pooled over subjects per site; the per-site mean shifts are the planted batch offsets that Table 3a quantifies before harmonization (a distribution QC view, not a statistical test). Full five-number summaries are in `reports/qc/qc_report_FC.md` Table Q2 and the committed SVG.
+
+| Site | Mean | SD |
+|---|---:|---:|
+| site_0 | 0.0826 | 1.3287 |
+| site_1 | 0.0277 | 1.3007 |
+| site_2 | -0.2255 | 1.2712 |
+| site_3 | -0.0521 | 1.3003 |
+| site_4 | -0.0721 | 1.2515 |
+| site_5 | 0.1155 | 1.2386 |
+
 ## Pre-registered real-data result shells
 
 **Table 4. Replication of published MDD connectivity findings on REST-meta-MDD Phase II.** Planned primary output of the real-data benchmark; population is blocked on #2, fold execution on #3/#6/#9, and table/figure rendering on #14. No real-data analysis has been run.
@@ -88,7 +115,7 @@ The pre/post-harmonization diagnostics of `src/loso_replication/diagnostics.py` 
 | Diagnostic | FC | ALFF | ReHo | Acceptance summary | Status |
 |---|---:|---:|---:|---|---|
 | Subjects retained after QC | — | — | — | — | Awaiting DUA (#2) |
-| Motion outliers/exclusions by site | — | — | — | — | Planned (#13) |
+| Motion outliers/exclusions by site | — | — | — | — | Machinery demonstrated on synthetic inputs (Table 3c); real-data run planned (#13) |
 | Site-related variance before harmonization | — | — | — | — | Planned (#10) |
 | Site-related variance after harmonization | — | — | — | — | Planned (#10) |
 | Protected diagnosis/age/sex signal retained | — | — | — | — | Planned (#8, #10) |
@@ -117,5 +144,7 @@ The pre/post-harmonization diagnostics of `src/loso_replication/diagnostics.py` 
 | `main` | 8d309f4 | blob-SHA check of all 23 pushed files | 23/23 match | One SVG transcription error caught and fixed in 8d309f4 |
 | `main` | b3d7075, 9d8ee60 | `python -m pytest -q` | 69/69 pass (17.11 s) | Python 3.12, CPU; adds 11 batch-diagnostics tests (issue #10 machinery) |
 | `main` | b3d7075, 9d8ee60 | `make check-repro`; `make diagnostics-demo` re-run | Pass; byte-identical | 8 committed summary keys reproduced exactly; diagnostics outputs deterministic on re-run |
+| `main` | issue-#13 QC change set | `python -m pytest -q` | 82/82 pass (20.00 s) | Python 3.12, CPU; adds 13 input-QC tests (issue #13 machinery) |
+| `main` | issue-#13 QC change set | `make check-repro`; `make qc-demo` re-run | Pass; byte-identical | 8 committed summary keys reproduced exactly; QC JSON/Markdown/SVG outputs deterministic on re-run |
 
 The older verification note remains at `results.md`; this file is the paper-style results record used by the README going forward.
