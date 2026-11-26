@@ -1,7 +1,7 @@
 # One-command entry points. Real-data runs require the REST-meta-MDD
 # Phase II DUA and a local data root (never committed).
 
-.PHONY: install test stage-demo benchmark-demo benchmark check-repro folds-demo paper1-demo diagnostics-demo
+.PHONY: install test stage-demo benchmark-demo benchmark check-repro folds-demo paper1-demo diagnostics-demo qc-demo
 
 DATA_ROOT ?= data/demo
 
@@ -44,3 +44,8 @@ paper1-demo:
 # dataset (issue #10 machinery; writes reports/diagnostics/).
 diagnostics-demo:
 	python scripts/run_diagnostics.py --data-root $(DATA_ROOT) --synthetic
+
+# Motion and preprocessing input-QC report on a synthetic dataset with
+# planted motion outliers (issue #13 machinery; writes reports/qc/).
+qc-demo:
+	python scripts/run_qc_report.py --data-root $(DATA_ROOT) --synthetic
