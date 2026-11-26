@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 from .io import DataAccessError, load_dataset
-from .simulate import simulate_multisite
+from .simulate import simulate_motion, simulate_multisite
 
 __all__ = [
     "EXPECTED_LAYOUT",
@@ -139,12 +139,25 @@ def stage_synthetic_demo(
     n_per_site: int = 40,
     n_features: int = 60,
     seed: int = 0,
+    with_motion: bool = False,
 ) -> dict:
     """Write a synthetic dataset in the exact staged layout (demo mode).
 
     Used to exercise the prepare -> benchmark path without DUA data. The
     synthetic data carry planted replicable effects, planted site batch
     shifts, and known ground truth (see :mod:`loso_replication.simulate`).
+
+    Args:
+        data_root: Directory to write the staged files into.
+        n_sites: Number of synthetic sites.
+        n_per_site: Subjects per site.
+        n_features: Number of synthetic features.
+        seed: RNG seed; identical seeds reproduce identical files.
+        with_motion: Also write a ``mean_fd`` column (planted motion
+            outliers, ground truth recorded in the staging report) so the
+            issue-#13 QC machinery can be exercised end to end. Default
+            False: the staged files are then byte-identical to earlier
+            revisions of this function.
     """
     root = Path(data_root)
     root.mkdir(parents=True, exist_ok=True)
@@ -154,14 +167,26 @@ def stage_synthetic_demo(
     X = ds.X.copy()
     X.index = [f"sub{i:04d}" for i in range(len(X))]
     X.to_csv(root / "features_fc.csv")
-    pd.DataFrame(
+    phen = pd.DataFrame(
         {"subject": X.index, "site": ds.sites, "diagnosis": ds.y}
-    ).to_csv(root / "phenotypes.csv", index=False)
+    )
+    motion_ground_truth: dict | None = None
+    if with_motion:
+        fd, planted = simulate_motion(ds.sites, seed=seed)
+        phen["mean_fd"] = fd
+        motion_ground_truth = {
+            "column": "mean_fd",
+            "n_planted_outliers": int(planted.sum()),
+            "planted_outlier_subjects": phen.loc[planted, "subject"].tolist(),
+        }
+    phen.to_csv(root / "phenotypes.csv", index=False)
 
     report = validate_staged(root, modalities=("FC",))
     report["synthetic"] = True
     report["seed"] = seed
     report["replicable_features"] = ds.replicable_features
+    if motion_ground_truth is not None:
+        report["motion"] = motion_ground_truth
     write_staging_report(root, report)
     return report
 
